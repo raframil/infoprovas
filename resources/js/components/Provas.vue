@@ -1,19 +1,38 @@
 <template>
   <div class="disciplinas">
-    <h1 class="display-1 grey--text">Provas de {{ disciplina.nome }}</h1>
+    <v-container grid-list-md>
+      <v-layout row wrap>
+        <v-flex lg1>
+          <v-btn small round @click="voltarPagina">
+            <v-icon>keyboard_arrow_left</v-icon>
+          </v-btn>
+        </v-flex>
+        <v-flex lg11>
+          <h1
+            class="display-1 grey--text"
+            lg10
+          >Provas de {{ disciplina.nome }} ({{disciplina.codigo}})</h1>
+        </v-flex>
+      </v-layout>
+    </v-container>
     <v-container v-if="provas && provas.length" grid-list-md text-xs-center>
       <v-data-table :headers="headers" :items="provas" class="elevation-1">
         <template v-slot:items="provas">
-          <td class="text-xs-center">{{ provas.item.periodo }}</td>
           <td class="text-xs-left">{{ provas.item.professores.nome }}</td>
           <td class="text-xs-left">{{ provas.item.tipo_prova.descricao }}</td>
           <td class="text-xs-left">{{ provas.item.ano }}</td>
+          <td class="text-xs-center">{{ provas.item.periodo }}</td>
           <td class="text-xs-center">
-            <v-btn small color="blue-grey" class="white--text">
+            <v-btn
+              small
+              color="blue-grey"
+              class="white--text"
+              @click="visualizarProva(provas.item.id)"
+            >
               Visualizar
               <v-icon right dark>remove_red_eye</v-icon>
             </v-btn>
-            <v-btn small class="warning">
+            <v-btn small class="warning" @click="downloadProva(provas.item.id)">
               Download
               <v-icon right dark>cloud_download</v-icon>
             </v-btn>
@@ -45,17 +64,17 @@ export default {
       //tabela
       headers: [
         {
-          text: "Período",
-          align: "center",
-          value: "periodo"
-        },
-        {
           text: "Professor",
           align: "left",
           value: "professor"
         },
         { text: "Tipo de Prova", value: "tipo_prova" },
         { text: "Ano", value: "ano" },
+        {
+          text: "Período",
+          align: "center",
+          value: "periodo"
+        },
         { text: "Ação", value: "action", align: "center" }
       ]
     };
@@ -66,6 +85,9 @@ export default {
     this.getDisciplina();
   },
   methods: {
+    changeLocale() {
+      this.$vuetify.lang.current = "pt";
+    },
     getProvasFromDisciplina() {
       fetch(`api/provas/${this.disciplina_id}`)
         .then(res => res.json())
@@ -80,6 +102,22 @@ export default {
         .then(res => {
           this.disciplina = res.data;
         });
+    },
+    visualizarProva(prova_id) {
+      // caminho do arquivo = id unico da disciplina + codigo
+      var codigo_pasta = this.disciplina.id + this.disciplina.codigo;
+      fetch("api/ver_prova/" + codigo_pasta + "/" + prova_id).then(res => {
+        var newWindow = window.open(res.url, "my window");
+      });
+    },
+    downloadProva(prova_id) {
+      var codigo_pasta = this.disciplina.id + this.disciplina.codigo;
+      fetch("api/ver_prova/" + codigo_pasta + "/" + prova_id).then(res => {
+        var newWindow = window.open(res.url, "my window");
+      });
+    },
+    voltarPagina() {
+      this.$router.go(-1);
     }
   }
 };

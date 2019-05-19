@@ -3,6 +3,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Http\Requests;
+use Validator;
 use App\Disciplina;
 use App\Http\Resources\Disciplina as DisciplinaResource;
 
@@ -13,7 +14,7 @@ class DisciplinaController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index($curso_id)
+    public function showByCurso($curso_id)
     {
         $disciplinas = Disciplina::where('curso_id', $curso_id)->get();
         return DisciplinaResource::collection($disciplinas);
@@ -26,13 +27,27 @@ class DisciplinaController extends Controller
      */
     public function store(Request $request)
     {
-        /*$article = $request->isMethod('put') ? Article::findOrFail($request->article_id) : new Article;
-        $article->id = $request->input('article_id');
-        $article->title = $request->input('title');
-        $article->body = $request->input('body');
-        if ($article->save()) {
-            return new ArticleResource($article);
-        }*/ }
+        $validator = Validator::make($request->all(), [
+            'nome' => 'required',
+            'codigo' => 'required',
+            'periodo' => 'required',
+            'curso_id' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()], 401);
+        }
+        $disciplina = Disciplina::create($request->all());
+        return response()->json(['message' => 'Success', 'disciplina' => $disciplina], 200);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $disciplina = Disciplina::findOrFail($id);
+        $disciplina->update($request->all());
+        //return $disciplina;
+        return response()->json(['message' => 'Update successfully', 'disciplina' => $disciplina], 200);
+    }
+
     /**
      * Display the specified resource.
      *
@@ -57,4 +72,10 @@ class DisciplinaController extends Controller
         if ($article->delete()) {
             return new ArticleResource($article);
         }*/ }
+
+    public function index()
+    {
+        $disciplinas = Disciplina::get();
+        return DisciplinaResource::collection($disciplinas);
+    }
 }

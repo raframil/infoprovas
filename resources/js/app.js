@@ -1,9 +1,16 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
 import Vuetify from "vuetify";
+// Translation provided by Vuetify (typescript)
+import pt from "vuetify/es5/locale/pt";
 
 Vue.use(VueRouter);
-Vue.use(Vuetify);
+Vue.use(Vuetify, {
+    lang: {
+        locales: { pt },
+        current: "pt"
+    }
+});
 
 // Rotas
 const routes = [
@@ -21,6 +28,12 @@ const routes = [
         name: "provas",
         props: true,
         component: require("./components/Provas.vue").default
+    },
+    {
+        path: "/admin/disciplinas",
+        name: "admin_disciplinas",
+        props: true,
+        component: require("./components/AdminDisciplinas.vue").default
     }
 ];
 
@@ -34,7 +47,7 @@ Vue.component(
     "footer-component",
     require("./components/FooterComponent.vue").default
 );
-Vue.component("buscar-cursos", require("./components/BuscarCurso.vue").default);
+//Vue.component("buscar-cursos", require("./components/BuscarCurso.vue").default);
 Vue.component(
     "pagina-carregando",
     require("./components/PaginaCarregando.vue").default

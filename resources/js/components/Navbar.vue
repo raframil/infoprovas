@@ -3,7 +3,7 @@
     <!-- toolbar --->
     <v-toolbar color="indigo" dark fixed app>
       <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
-      <v-toolbar-title>AProvaFácil</v-toolbar-title>
+      <v-toolbar-title>UaiProva</v-toolbar-title>
     </v-toolbar>
     <!-- drawer -->
     <v-navigation-drawer fixed v-model="drawer" app>
@@ -33,7 +33,12 @@ export default {
       items: [
         { title: "Home", icon: "dashboard", path: "/home" },
         { title: "Cursos", icon: "school", path: "/cursos" },
-        { title: "Sobre", icon: "question_answer", path: "/sobre" }
+        { title: "Sobre", icon: "question_answer", path: "/sobre" },
+        {
+          title: "CRUD Disciplinas",
+          icon: "question_answer",
+          path: "/admin/disciplinas"
+        }
       ],
       right: null
     };

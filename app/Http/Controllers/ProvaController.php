@@ -2,6 +2,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use File;
+use Response;
+use Storage;
 use App\Http\Requests;
 use App\Prova;
 use App\Http\Resources\Prova as ProvaResource;
@@ -58,4 +61,38 @@ class ProvaController extends Controller
         if ($article->delete()) {
             return new ArticleResource($article);
         }*/ }
+
+  public function visualizarProva($codigo, $id)
+  {
+    $prova = Prova::findOrFail($id);
+    $filename = $prova->arquivo;
+    $path = "public/storage/" . $codigo . "/" . $filename;
+    //echo $path;
+
+    if (!File::exists($path)) {
+      abort(404);
+    }
+
+    $file = File::get($path);
+    $type = File::mimeType($path);
+
+    $response = Response::make($file, 200);
+    $response->header("Content-Type", $type);
+
+    return $response;
+  }
+
+  public function downloadProva($codigo, $id)
+  {
+    $prova = Prova::findOrFail($id);
+    //pega o nome do arquivo e encaminha com o storage
+    $filename = $prova->arquivo;
+    $path = "storage/" . $codigo . "/" . $filename;
+
+    if (!File::exists($path)) {
+      abort(404);
+    }
+    $headers = array('Content-Type' => 'application/pdf');
+    return response()->download($path, $filename, $headers);
+  }
 }

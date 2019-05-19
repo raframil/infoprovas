@@ -11,7 +11,7 @@
         }
     </script>
 
-    <title>AProvaFácil - Repositório de provas da UNIFEI</title>
+    <title>UaiProva - Repositório de provas da UNIFEI</title>
 
     <!-- Material Design -->
     <link href='https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900|Material+Icons' rel="stylesheet">

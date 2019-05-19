@@ -1,6 +1,18 @@
 <template>
   <div class="disciplinas">
-    <h1 class="display-1 grey--text">Disciplinas de {{ curso.nome }}</h1>
+    <v-container grid-list-md>
+      <v-layout row wrap>
+        <v-flex lg1>
+          <v-btn small round @click="voltarPagina">
+            <v-icon>keyboard_arrow_left</v-icon>
+          </v-btn>
+        </v-flex>
+        <v-flex lg11>
+          <h1 class="display-1 grey--text" lg10>Disciplinas de {{ curso.nome }}</h1>
+        </v-flex>
+      </v-layout>
+    </v-container>
+
     <v-container v-if="disciplinas && disciplinas.length" grid-list-md text-xs-center>
       <v-data-table :headers="headers" :items="disciplinas" class="elevation-1">
         <template v-slot:items="disciplinas">
@@ -67,6 +79,9 @@ export default {
     this.getDisciplinasFromCurso();
   },
   methods: {
+    changeLocale() {
+      this.$vuetify.lang.current = "pt";
+    },
     getCurso() {
       fetch(`api/curso/${this.curso_id}`)
         .then(res => res.json())
@@ -80,6 +95,9 @@ export default {
         .then(res => {
           this.disciplinas = res.data;
         });
+    },
+    voltarPagina() {
+      this.$router.go(-1);
     }
   }
 };
