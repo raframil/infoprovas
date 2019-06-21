@@ -20,6 +20,7 @@ class CreateProvasTable extends Migration
             $table->string('arquivo', 255);
             $table->smallInteger('ano');
             $table->smallInteger('periodo');
+            $table->char('ativo', 1);
             $table->integer('disciplina_id')->unsigned();
             $table->integer('professor_id')->unsigned();
             $table->integer('tipo_prova_id')->unsigned();

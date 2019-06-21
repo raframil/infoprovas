@@ -14,11 +14,18 @@
     </v-container>
 
     <v-container v-if="disciplinas && disciplinas.length" grid-list-md text-xs-center>
-      <v-data-table :headers="headers" :items="disciplinas" class="elevation-1">
+      <v-data-table
+        :headers="headers"
+        :items="disciplinas"
+        :loading="isLoading"
+        class="elevation-1"
+        hide-actions
+      >
         <template v-slot:items="disciplinas">
           <td class="text-xs-center">{{ disciplinas.item.periodo }}</td>
           <td class="text-xs-left">{{ disciplinas.item.nome }}</td>
           <td class="text-xs-left">{{ disciplinas.item.codigo }}</td>
+          <td class="text-xs-center">{{ disciplinas.item.num_provas }}</td>
           <td class="text-xs-center">
             <v-btn
               class="info"
@@ -27,6 +34,13 @@
           </td>
         </template>
       </v-data-table>
+      <div class="text-xs-center pt-2">
+        <v-pagination
+          v-model="pagination.current_page"
+          :length="pagination.last_page"
+          @input="onPageChange"
+        ></v-pagination>
+      </div>
     </v-container>
     <v-container text-xs-center v-else-if="disciplinas && disciplinas.length == 0">
       <h2 class="red--text headline">Não há disciplinas registradas para este curso</h2>
@@ -48,13 +62,17 @@ export default {
         nome: "",
         campus: ""
       },
-      disciplinas: null,
-      disciplina: {
+      disciplinas: {
         id: "",
         nome: "",
         codigo: "",
-        curso_id: ""
+        curso_id: "",
+        num_provas: 0
       },
+
+      //disciplinas: null,
+      pagination: {},
+      isLoading: false,
 
       //tabela
       headers: [
@@ -69,6 +87,7 @@ export default {
           value: "nome"
         },
         { text: "Codigo", value: "codigo" },
+        { text: "N° de Provas", align: "center", value: "count_provas" },
         { text: "Ação", value: "action", align: "center" }
       ]
     };
@@ -79,6 +98,19 @@ export default {
     this.getDisciplinasFromCurso();
   },
   methods: {
+    onPageChange() {
+      this.getDisciplinasFromCurso();
+    },
+    makePagination(meta, links) {
+      let pagination = {
+        total: meta.total,
+        current_page: meta.current_page,
+        last_page: meta.last_page,
+        next_page_url: links.next,
+        prev_page_url: links.prev
+      };
+      this.pagination = pagination;
+    },
     changeLocale() {
       this.$vuetify.lang.current = "pt";
     },
@@ -90,10 +122,15 @@ export default {
         });
     },
     getDisciplinasFromCurso() {
-      fetch(`api/disciplinas/${this.curso_id}`)
+      this.isLoading = true;
+      fetch(
+        `api/disciplinas/${this.curso_id}?page=${this.pagination.current_page}`
+      )
         .then(res => res.json())
         .then(res => {
           this.disciplinas = res.data;
+          this.makePagination(res.meta, res.links);
+          this.isLoading = false;
         });
     },
     voltarPagina() {

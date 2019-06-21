@@ -3,6 +3,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Http\Requests;
+use App\Prova;
 use Validator;
 use App\Disciplina;
 use App\Http\Resources\Disciplina as DisciplinaResource;
@@ -15,6 +16,17 @@ class DisciplinaController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function showByCurso($curso_id)
+    {
+        $disciplinas = Disciplina::where('curso_id', $curso_id)->paginate(15);
+        //seleciona o numero de provas por disciplina
+        foreach ($disciplinas as $key => $disciplina) {
+            $num_provas = Prova::where("disciplina_id", $disciplina->id)->where("ativo", "S")->count();
+            $disciplina->num_provas = $num_provas;
+        }
+        return DisciplinaResource::collection($disciplinas);
+    }
+
+    public function getAll($curso_id)
     {
         $disciplinas = Disciplina::where('curso_id', $curso_id)->get();
         return DisciplinaResource::collection($disciplinas);
@@ -37,15 +49,14 @@ class DisciplinaController extends Controller
             return response()->json(['error' => $validator->errors()], 401);
         }
         $disciplina = Disciplina::create($request->all());
-        return response()->json(['message' => 'Success', 'disciplina' => $disciplina], 200);
+        return response()->json(['message' => 'Sucesso', 'disciplina' => $disciplina], 201);
     }
 
     public function update(Request $request, $id)
     {
         $disciplina = Disciplina::findOrFail($id);
         $disciplina->update($request->all());
-        //return $disciplina;
-        return response()->json(['message' => 'Update successfully', 'disciplina' => $disciplina], 200);
+        return response()->json(['message' => 'Sucesso', 'disciplina' => $disciplina], 200);
     }
 
     /**
@@ -67,11 +78,13 @@ class DisciplinaController extends Controller
      */
     public function destroy($id)
     {
-        /* Get article
-        $article = Article::findOrFail($id);
-        if ($article->delete()) {
-            return new ArticleResource($article);
-        }*/ }
+        $disciplina = Disciplina::findOrFail($id);
+        if ($disciplina->delete()) {
+            return response()->json(['message' => 'Sucesso', 'disciplina' => $disciplina], 200);
+        } else {
+            return response()->json(['message' => 'Erro'], 404);
+        }
+    }
 
     public function index()
     {

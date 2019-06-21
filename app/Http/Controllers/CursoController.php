@@ -15,9 +15,7 @@ class CursoController extends Controller
      */
     public function index()
     {
-        // Get articles
         $cursos = Curso::get();
-        // Return collection of articles as a resource
         return CursoResource::collection($cursos);
     }
     /**

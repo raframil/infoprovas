@@ -5,9 +5,14 @@ use Illuminate\Http\Request;
 use File;
 use Response;
 use Storage;
+use Validator;
+use App\Disciplina;
+use App\Curso;
 use App\Http\Requests;
 use App\Prova;
 use App\Http\Resources\Prova as ProvaResource;
+use PHPUnit\Framework\Exception;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
 class ProvaController extends Controller
 {
@@ -18,8 +23,12 @@ class ProvaController extends Controller
    */
   public function index($disciplina_id)
   {
-    //$provas = Prova::where('disciplina_id', $disciplina_id)->join('professores', 'professores.id', '=', 'provas.professor_id')->get();
-    $provas = Prova::where('disciplina_id', $disciplina_id)->with('professores')->with('tipoProva')->with('disciplina')->get();
+    $provas = Prova::where('disciplina_id', $disciplina_id)
+      ->where('ativo', 'S')
+      ->with('professores')
+      ->with('tipoProva')
+      ->with('disciplina')
+      ->paginate(15);
     return ProvaResource::collection($provas);
   }
   /**
@@ -30,13 +39,51 @@ class ProvaController extends Controller
    */
   public function store(Request $request)
   {
-    /*$article = $request->isMethod('put') ? Article::findOrFail($request->article_id) : new Article;
-        $article->id = $request->input('article_id');
-        $article->title = $request->input('title');
-        $article->body = $request->input('body');
-        if ($article->save()) {
-            return new ArticleResource($article);
-        }*/ }
+    $validator = Validator::make($request->all(), [
+      'upload' => 'required',
+      'ano' => 'required',
+      'periodo' => 'required',
+      'disciplina_id' => 'required',
+      'professor_id' => 'required',
+      'tipo_prova_id' => 'required',
+    ]);
+    if ($validator->fails()) {
+      return response()->json(['error' => $validator->errors()], 401);
+    }
+    $disciplina = Disciplina::findOrFail($request->disciplina_id);
+    $curso = Curso::findOrFail($disciplina->curso_id);
+
+    $uploadedFile = $request->file('upload');
+    $filename = md5(time()) . '.pdf';
+
+    $pasta_curso = $curso->nome;
+    $pasta_disciplina = $disciplina->id . $disciplina->codigo;
+    $fullPath = 'provas/' . $curso->campus . "/" . $pasta_curso . "/" . $pasta_disciplina . "/";
+
+    if (!empty($uploadedFile)) {
+      try {
+        Storage::disk('local')->putFileAs(
+          $fullPath,
+          $uploadedFile,
+          $filename
+        );
+        $prova_upload = Prova::create([
+          'arquivo' => $fullPath . $filename,
+          'ano' => $request->ano,
+          'periodo' => $request->periodo,
+          'disciplina_id' => $request->disciplina_id,
+          'professor_id' => $request->professor_id,
+          'tipo_prova_id' => $request->tipo_prova_id,
+          'ativo' => 'S'
+        ]);
+        //return Storage::url($uploadedFile);
+        return response()->json(['message' => 'Sucesso', 'prova' => $prova_upload], 201);
+      } catch (FileException $e) {
+        return $e;
+      }
+    }
+  }
+
   /**
    * Display the specified resource.
    *
@@ -55,44 +102,32 @@ class ProvaController extends Controller
    * @return \Illuminate\Http\Response
    */
   public function destroy($id)
-  {
-    /* Get article
-        $article = Article::findOrFail($id);
-        if ($article->delete()) {
-            return new ArticleResource($article);
-        }*/ }
+  { }
 
-  public function visualizarProva($codigo, $id)
+
+  public function visualizarProva($id)
   {
     $prova = Prova::findOrFail($id);
-    $filename = $prova->arquivo;
-    $path = "public/storage/" . $codigo . "/" . $filename;
-    //echo $path;
+    $filePath = $prova->arquivo;
 
-    if (!File::exists($path)) {
-      abort(404);
+    if (!Storage::exists($filePath)) {
+      return response()->json(['message' => 'Erro', 'resultado' => 'Arquivo não encontrado'], 404);
+    } else {
+      return Storage::response($filePath);
     }
-
-    $file = File::get($path);
-    $type = File::mimeType($path);
-
-    $response = Response::make($file, 200);
-    $response->header("Content-Type", $type);
-
-    return $response;
   }
 
-  public function downloadProva($codigo, $id)
+
+  public function downloadProva($id)
   {
     $prova = Prova::findOrFail($id);
-    //pega o nome do arquivo e encaminha com o storage
-    $filename = $prova->arquivo;
-    $path = "storage/" . $codigo . "/" . $filename;
+    $filePath = $prova->arquivo;
 
-    if (!File::exists($path)) {
-      abort(404);
+    if (!Storage::exists($filePath)) {
+      return response()->json(['message' => 'Erro', 'resultado' => 'Arquivo não encontrado'], 404);
+    } else {
+      $headers = array('Content-Type' => 'application/pdf');
+      return Storage::download($filePath, null, $headers);
     }
-    $headers = array('Content-Type' => 'application/pdf');
-    return response()->download($path, $filename, $headers);
   }
 }

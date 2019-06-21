@@ -17,7 +17,6 @@ class CreateProfessoresTable extends Migration
         Schema::create('professores', function (Blueprint $table) {
             $table->increments('id');
             $table->string('nome', 255);
-            # Indexes
         });
     }
 
@@ -26,8 +25,8 @@ class CreateProfessoresTable extends Migration
      *
      * @return void
      */
-     public function down()
-     {
+    public function down()
+    {
 
         Schema::drop('professores');
     }

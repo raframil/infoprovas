@@ -31,12 +31,17 @@ export default {
     return {
       drawer: null,
       items: [
-        { title: "Home", icon: "dashboard", path: "/home" },
+        { title: "Home", icon: "home", path: "/home" },
         { title: "Cursos", icon: "school", path: "/cursos" },
         { title: "Sobre", icon: "question_answer", path: "/sobre" },
         {
-          title: "CRUD Disciplinas",
-          icon: "question_answer",
+          title: "Enviar Prova",
+          icon: "cloud_upload",
+          path: "/enviar_prova"
+        },
+        {
+          title: "Administrar Disciplinas",
+          icon: "widgets",
           path: "/admin/disciplinas"
         }
       ],

@@ -34,6 +34,11 @@ const routes = [
         name: "admin_disciplinas",
         props: true,
         component: require("./components/AdminDisciplinas.vue").default
+    },
+    {
+        path: "/enviar_prova",
+        name: "enviar_prova",
+        component: require("./components/EnviarProva.vue").default
     }
 ];
 

@@ -6,6 +6,17 @@ use Illuminate\Database\Eloquent\Model;
 class Prova extends Model
 {
   protected $table = 'provas';
+  public $timestamps = false;
+
+  protected $fillable = [
+    'arquivo',
+    'ano',
+    'periodo',
+    'disciplina_id',
+    'professor_id',
+    'tipo_prova_id',
+    'ativo'
+  ];
 
   public function professores()
   {

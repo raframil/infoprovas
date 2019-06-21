@@ -16,7 +16,13 @@
       </v-layout>
     </v-container>
     <v-container v-if="provas && provas.length" grid-list-md text-xs-center>
-      <v-data-table :headers="headers" :items="provas" class="elevation-1">
+      <v-data-table
+        :headers="headers"
+        :items="provas"
+        class="elevation-1"
+        :loading="isLoading"
+        hide-actions
+      >
         <template v-slot:items="provas">
           <td class="text-xs-left">{{ provas.item.professores.nome }}</td>
           <td class="text-xs-left">{{ provas.item.tipo_prova.descricao }}</td>
@@ -39,6 +45,11 @@
           </td>
         </template>
       </v-data-table>
+      <v-pagination
+        v-model="pagination.current_page"
+        :length="pagination.last_page"
+        @input="onPageChange"
+      ></v-pagination>
     </v-container>
     <v-container text-xs-center v-else-if="provas && provas.length == 0">
       <h2 class="red--text headline">Não há provas registradas para esta disciplina</h2>
@@ -54,6 +65,8 @@ export default {
   data() {
     return {
       provas: null,
+      pagination: {},
+      isLoading: false,
       disciplina: {
         id: "",
         nome: "",
@@ -85,15 +98,32 @@ export default {
     this.getDisciplina();
   },
   methods: {
+    onPageChange() {
+      this.getProvasFromDisciplina();
+    },
+    makePagination(meta, links) {
+      let pagination = {
+        total: meta.total,
+        current_page: meta.current_page,
+        last_page: meta.last_page,
+        next_page_url: links.next,
+        prev_page_url: links.prev
+      };
+      this.pagination = pagination;
+    },
     changeLocale() {
       this.$vuetify.lang.current = "pt";
     },
     getProvasFromDisciplina() {
-      fetch(`api/provas/${this.disciplina_id}`)
+      this.isLoading = true;
+      fetch(
+        `api/provas/${this.disciplina_id}?page=${this.pagination.current_page}`
+      )
         .then(res => res.json())
         .then(res => {
-          console.log(res.data);
           this.provas = res.data;
+          this.makePagination(res.meta, res.links);
+          this.isLoading = false;
         });
     },
     getDisciplina() {
@@ -104,15 +134,12 @@ export default {
         });
     },
     visualizarProva(prova_id) {
-      // caminho do arquivo = id unico da disciplina + codigo
-      var codigo_pasta = this.disciplina.id + this.disciplina.codigo;
-      fetch("api/ver_prova/" + codigo_pasta + "/" + prova_id).then(res => {
+      fetch("api/ver_prova/" + prova_id).then(res => {
         var newWindow = window.open(res.url, "my window");
       });
     },
     downloadProva(prova_id) {
-      var codigo_pasta = this.disciplina.id + this.disciplina.codigo;
-      fetch("api/ver_prova/" + codigo_pasta + "/" + prova_id).then(res => {
+      fetch("api/baixar_prova/" + prova_id).then(res => {
         var newWindow = window.open(res.url, "my window");
       });
     },

@@ -17,7 +17,6 @@ class CreateTipoProvasTable extends Migration
         Schema::create('prova_tipos', function (Blueprint $table) {
             $table->increments('id');
             $table->string('descricao', 50);
-            # Indexes
         });
     }
 

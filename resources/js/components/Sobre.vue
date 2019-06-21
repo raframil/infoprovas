@@ -33,6 +33,39 @@
               </v-card-text>
             </v-card>
           </v-expansion-panel-content>
+          <v-expansion-panel-content>
+            <template v-slot:header>
+              <div>Por que preciso fazer login para enviar uma prova?</div>
+            </template>
+            <v-card>
+              <v-card-text
+                class="grey lighten-3"
+              >Para evitarmos spam e pessoas mal-intencionadas. As provas enviadas deverão ser aprovadas, ou seja, será verificado no sistema os dados enviados e a veracidade da avaliação.</v-card-text>
+            </v-card>
+          </v-expansion-panel-content>
+          <v-expansion-panel-content>
+            <template v-slot:header>
+              <div>Meus dados serão exibidos se eu enviar uma prova?</div>
+            </template>
+            <v-card>
+              <v-card-text
+                class="grey lighten-3"
+              >Nenhum dado será exibido, garantindo anonimato dos contribuintes.</v-card-text>
+            </v-card>
+          </v-expansion-panel-content>
+          <v-expansion-panel-content>
+            <template v-slot:header>
+              <div>Quem fez o sistema?</div>
+            </template>
+            <v-card>
+              <v-card-text class="grey lighten-3">
+                O sistema foi desenvolvido pelo aluno de SIN
+                <a
+                  href="https://linkedin.com/in/rafael-framil-747583ba/"
+                >Rafael Framil</a>.
+              </v-card-text>
+            </v-card>
+          </v-expansion-panel-content>
         </v-expansion-panel>
       </div>
     </v-container>
@@ -41,9 +74,6 @@
 
 <script>
 export default {
-  mounted() {
-    console.log("Sobre Component mounted.");
-  },
   data() {
     return {
       panel: [false, false]
