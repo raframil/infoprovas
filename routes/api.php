@@ -17,6 +17,10 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+// Rotas de Usuário
+Route::post('user/register', 'APIRegisterController@register');
+Route::post('user/login', 'APILoginController@login');
+
 
 // Listar todos os cursos
 Route::get('cursos', 'CursoController@index');
