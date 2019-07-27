@@ -24,6 +24,7 @@ class CreateProvasTable extends Migration
             $table->integer('disciplina_id')->unsigned();
             $table->integer('professor_id')->unsigned();
             $table->integer('tipo_prova_id')->unsigned();
+            $table->integer('quem_enviou')->unsigned();
 
             $table->foreign('disciplina_id')
                 ->references('id')->on('disciplinas')
@@ -37,6 +38,11 @@ class CreateProvasTable extends Migration
 
             $table->foreign('tipo_prova_id')
                 ->references('id')->on('prova_tipos')
+                ->onDelete('no action')
+                ->onUpdate('no action');
+
+            $table->foreign('quem_enviou')
+                ->references('id')->on('users')
                 ->onDelete('no action')
                 ->onUpdate('no action');
         });

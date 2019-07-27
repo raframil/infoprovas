@@ -1,6 +1,7 @@
 <template>
-  <div class="enviar_prova">
+  <div class="enviar_prova" v-if="user_id">
     <h1 class="display-2 grey--text">Enviar Prova</h1>
+
     <v-form ref="form" v-model="valid" lazy-validation>
       <v-card class="my-5">
         <v-card-title primary-title>
@@ -14,6 +15,7 @@
           </div>
         </v-card-title>
         <v-container>
+          <v-alert v-if="errorMessage" :value="true" type="error">{{ errorMessage }}</v-alert>
           <v-layout row wrap>
             <v-flex lg12 xs12>
               <v-autocomplete
@@ -56,6 +58,13 @@
               ></v-autocomplete>
             </v-flex>
 
+            <v-flex lg12 xs12 class="pb-5">
+              <p>Não encontrou? Você pode adicionar um novo professor no botão abaixo</p>
+              <v-btn small color="green" class="white--text">
+                <v-icon>add</v-icon>Adicionar Professor
+              </v-btn>
+            </v-flex>
+
             <v-flex lg4 md4 xs12 class="pr-2 pl-2">
               <v-select
                 :items="prova_tipos"
@@ -96,7 +105,7 @@
                 Carregar Prova
                 <v-icon right dark>cloud_upload</v-icon>
               </v-btn>
-              <input type="file" id="file-upload" style="display:none" @change="onFileChange">
+              <input type="file" id="file-upload" style="display:none" @change="onFileChange" />
             </v-flex>
             <v-flex text-xs-center v-if="selectedFile.name != ''">
               Arquivo:
@@ -108,7 +117,7 @@
             </v-flex>
 
             <v-flex xs12 text-xs-right class="mt-5">
-              <v-btn color="primary" dark @click="uploadFile">
+              <v-btn color="primary" dark @click="uploadFile" :loading="loadingBotaoEnviar">
                 Enviar
                 <v-icon right dark>send</v-icon>
               </v-btn>
@@ -124,16 +133,25 @@
       <v-btn flat color="white" @click="snackbar = false">Fechar</v-btn>
     </v-snackbar>
   </div>
+  <v-alert :value="true" type="error" v-else-if="alertaSessaoInvalida == true">
+    {{ errorMessage }}
+    <v-progress-circular indeterminate color="white"></v-progress-circular>
+  </v-alert>
+  <pagina-carregando v-else></pagina-carregando>
 </template>
 
 <script>
 export default {
   data: () => ({
+    alertaSessaoInvalida: false,
+    errorMessage: null,
+    loadingBotaoEnviar: false,
     // Snackbar
     snackbar: false,
     snackbar_message: "",
     snackbar_color: "",
     // Variáveis
+    user_id: 0,
     curso_id: 0,
     model_curso: null,
     cursos: null,
@@ -184,6 +202,7 @@ export default {
     tipoProvaRules: [v => !!v || "Tipo de prova deve ser selecionado"],
     anoAplicacaoRules: [
       v => !!v || "Ano de aplicação da prova deve ser preenchido",
+      v => (v && v.length > 3) || "O ano deve possuir 4 caracters (AAAA)",
       v => (v && v.length <= 4) || "O ano não deve exceder 4 caracteres"
     ],
     periodoRules: [
@@ -195,6 +214,7 @@ export default {
     this.getTipoProvas();
     this.fetchCursos();
     this.getProfessores();
+    this.getUser();
   },
   watch: {
     search(val) {
@@ -273,14 +293,19 @@ export default {
     onFileChange(e) {
       var self = this;
       var file = e.target.files[0];
+      var FileSize = file.size / 1024 / 1024; // in MB
       if (file.type != "application/pdf") {
         this.snackbar_color = "error";
         this.snackbar_message =
           "O arquivo não é um PDF. Por favor, envie outro";
         this.snackbar = true;
+      } else if (FileSize > 10) {
+        this.snackbar_color = "error";
+        this.snackbar_message = "O arquivo carregado excedeu o limite de 10MB";
+        this.snackbar = true;
       } else {
         this.snackbar_color = "success";
-        this.snackbar_message = "Arquivo válido!";
+        this.snackbar_message = "Arquivo carregado com sucesso";
         this.snackbar = true;
         // Seleciona o arquivo
         this.selectedFile = file;
@@ -288,7 +313,9 @@ export default {
     },
     uploadFile() {
       if (this.$refs.form.validate()) {
+        this.loadingBotaoEnviar = true;
         if (this.selectedFile.name == "") {
+          this.loadingBotaoEnviar = false;
           this.snackbar_color = "error";
           this.snackbar_message = "Por favor, selecione um arquivo";
           this.snackbar = true;
@@ -310,23 +337,57 @@ export default {
 
         fetch("api/provas/upload", {
           method: "POST",
-          body: formData
+          body: formData,
+          headers: new Headers({
+            Authorization: "Bearer " + localStorage.getItem("access_token")
+          })
         })
           .then(res => res.json())
           .then(res => {
-            this.snackbar_color = "success";
-            this.snackbar_message = "Prova enviada com sucesso";
-            this.snackbar = true;
-
-            console.log(res);
+            if (res.error) {
+              this.loadingBotaoEnviar = false;
+              this.snackbar_color = "error";
+              this.snackbar_message = res.error;
+              this.snackbar = true;
+            } else {
+              this.loadingBotaoEnviar = false;
+              this.snackbar_color = "success";
+              this.snackbar_message = "Prova enviada com sucesso";
+              this.snackbar = true;
+              this.reset();
+              this.resetValidation();
+            }
           })
           .catch(error => {
+            this.loadingBotaoEnviar = false;
             this.snackbar_color = "error";
             this.snackbar_message = "Um erro ocorreu";
             this.snackbar = true;
             console.log(res.error);
           });
       }
+    },
+    getUser() {
+      this.$store.dispatch("getUserData").then(response => {
+        if (response.data.error) {
+          if (response.data.error == "TOKEN_INVALID") {
+            this.alertaSessaoInvalida = true;
+            this.errorMessage =
+              "Token Inválido. Por favor, realize login novamente  ";
+            setTimeout(() => this.$router.push({ name: "logout" }), 3000);
+          } else if (response.data.error == "TOKEN_EXPIRED") {
+            this.alertaSessaoInvalida = true;
+            this.errorMessage =
+              "Sua sessão expirou. Por favor, realize login novamente  ";
+            setTimeout(() => this.$router.push({ name: "logout" }), 3000);
+          } else {
+            setTimeout(() => this.$router.push({ name: "logout" }), 3000);
+          }
+        }
+        if (response.data.status == "success" && response.data.data) {
+          this.user_id = response.data.data.id;
+        }
+      });
     }
   }
 };

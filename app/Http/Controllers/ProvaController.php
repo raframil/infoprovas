@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
@@ -13,6 +14,7 @@ use App\Prova;
 use App\Http\Resources\Prova as ProvaResource;
 use PHPUnit\Framework\Exception;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class ProvaController extends Controller
 {
@@ -60,6 +62,10 @@ class ProvaController extends Controller
     $pasta_disciplina = $disciplina->id . $disciplina->codigo;
     $fullPath = 'provas/' . $curso->campus . "/" . $pasta_curso . "/" . $pasta_disciplina . "/";
 
+    // seleciona o usuario pelo token enviado
+    $token = $request->header('Authorization');
+    $user = JWTAuth::toUser($token);
+
     if (!empty($uploadedFile)) {
       try {
         Storage::disk('local')->putFileAs(
@@ -74,6 +80,7 @@ class ProvaController extends Controller
           'disciplina_id' => $request->disciplina_id,
           'professor_id' => $request->professor_id,
           'tipo_prova_id' => $request->tipo_prova_id,
+          'quem_enviou' => $user->id,
           'ativo' => 'S'
         ]);
         //return Storage::url($uploadedFile);

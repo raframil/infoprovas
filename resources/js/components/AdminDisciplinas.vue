@@ -308,7 +308,10 @@ export default {
     },
     deleteDisciplina(id) {
       fetch(`api/disciplinas/${id}`, {
-        method: "delete"
+        method: "delete",
+        headers: new Headers({
+          Authorization: "Bearer " + localStorage.getItem("access_token")
+        })
       })
         .then(res => res.json())
         .then(res => {
@@ -329,6 +332,7 @@ export default {
           method: "POST",
           body: JSON.stringify(this.createDisciplina),
           headers: {
+            Authorization: "Bearer " + localStorage.getItem("access_token"),
             "Content-Type": "application/json"
           }
         })
@@ -405,7 +409,8 @@ export default {
         method: "PUT",
         body: JSON.stringify(this.editedDisciplina),
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + localStorage.getItem("access_token")
         }
       })
         .then(res => res.json())

@@ -20,18 +20,30 @@
 
 <body>
     <v-app id="app">
-        <navbar></navbar>
-
-        <v-content class="mx-4 my-4">
-
-            <router-view></router-view>
-
-        </v-content>
-
-        <footer-component></footer-component>
+        <main-app></main-app>
     </v-app>
 
     <script src="{{ asset('js/app.js') }}"></script>
 </body>
 
 </html>
+
+<style>
+    .v-enter,
+    .v-leave-to {
+        opacity: 0;
+    }
+
+    .v-enter {
+        transform: translate3d(0, -20px, 0);
+    }
+
+    .v-leave-to {
+        transform: translate3d(0, 20px, 0);
+    }
+
+    .v-enter-active,
+    .v-leave-active {
+        transition: all 0.3s;
+    }
+</style>

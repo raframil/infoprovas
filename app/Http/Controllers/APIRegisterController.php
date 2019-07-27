@@ -16,7 +16,7 @@ class APIRegisterController extends Controller
         $validator = Validator::make($request->all(), [
             'email' => 'required|string|email|max:255|unique:users',
             'name' => 'required',
-            'password' => 'required'
+            'password' => 'required|min:6'
         ]);
         if ($validator->fails()) {
             return response()->json($validator->errors());

@@ -14,5 +14,14 @@
 </template>
 
 <script>
-export default {};
+export default {
+  created() {
+    this.getUser();
+  },
+  methods: {
+    getUser() {
+      this.$store.dispatch("getUserData").then(response => {});
+    }
+  }
+};
 </script>

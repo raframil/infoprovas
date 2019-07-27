@@ -18,8 +18,9 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 // Rotas de Usuário
-Route::post('user/register', 'APIRegisterController@register');
-Route::post('user/login', 'APILoginController@login');
+Route::post('auth/register', 'APIRegisterController@register');
+Route::post('auth/login', 'APILoginController@login');
+
 
 
 // Listar todos os cursos
@@ -33,12 +34,16 @@ Route::get('disciplinas/{curso_id}', 'DisciplinaController@showByCurso');
 Route::get('disciplinas/all/{curso_id}', 'DisciplinaController@getAll');
 // Listar uma disciplina
 Route::get('disciplina/{curso_id}', 'DisciplinaController@show');
-// Criar uma disciplina
-Route::post('disciplinas', 'DisciplinaController@store');
-// Atualizar uma disciplina
-Route::put('disciplinas/{id}', 'DisciplinaController@update');
-// Deletar disciplina
-Route::delete('disciplinas/{id}', 'DisciplinaController@destroy');
+
+/* Parte administrativa*/
+Route::group(['middleware' => 'auth.role:admin'], function () {
+    // Criar uma disciplina
+    Route::post('disciplinas', 'DisciplinaController@store');
+    // Atualizar uma disciplina
+    Route::put('disciplinas/{id}', 'DisciplinaController@update');
+    // Deletar disciplina
+    Route::delete('disciplinas/{id}', 'DisciplinaController@destroy');
+});
 
 // Listar provas de uma disciplina
 Route::get('provas/{disciplina_id}', 'ProvaController@index');
@@ -47,12 +52,21 @@ Route::get('provas/{disciplina_id}', 'ProvaController@index');
 Route::get('ver_prova/{id}', 'ProvaController@visualizarProva');
 // Download prova
 Route::get('baixar_prova/{id}', 'ProvaController@downloadProva');
-// Upload de prova
-Route::post('provas/upload', ['uses' => 'ProvaController@store']);
-
 
 // Retorna todos os tipos de prova
 Route::get('prova_tipos', 'ProvaTipoController@index');
+
+// Upload de prova
+// Rotas de usuario protegida pela api, necessario um token JWT
+Route::group(['middleware' => 'jwt.auth'], function () {
+    Route::post('provas/upload', ['uses' => 'ProvaController@store']);
+    Route::post('auth/logout', 'APILoginController@logout');
+    Route::get('auth/user', 'APILoginController@user');
+});
+
+Route::group(['middleware' => 'jwt.refresh'], function () {
+    Route::get('auth/refresh', 'APILoginController@refresh');
+});
 
 // Retorna todos os professores
 Route::get('professores', 'ProfessorController@index');

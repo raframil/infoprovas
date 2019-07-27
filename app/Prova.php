@@ -1,4 +1,5 @@
 <?php
+
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
@@ -15,6 +16,7 @@ class Prova extends Model
     'disciplina_id',
     'professor_id',
     'tipo_prova_id',
+    'quem_enviou',
     'ativo'
   ];
 
