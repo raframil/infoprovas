@@ -16,7 +16,6 @@ Vue.use(Vuetify, {
     }
 });
 Vue.use(VueAxios, axios);
-axios.defaults.baseURL = process.env.API_URL;
 
 // Rotas da aplicacao
 const router = new VueRouter({
