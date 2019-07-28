@@ -17,6 +17,7 @@ class CreateProfessoresTable extends Migration
         Schema::create('professores', function (Blueprint $table) {
             $table->increments('id');
             $table->string('nome', 255);
+            $table->string('email')->nullable();
         });
     }
 
