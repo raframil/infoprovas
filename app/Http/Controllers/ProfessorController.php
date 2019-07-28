@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Professor;
 use Illuminate\Http\Request;
 use App\Http\Resources\Professor as ProfessorResource;
+use Validator;
 
 class ProfessorController extends Controller
 {
@@ -37,7 +38,14 @@ class ProfessorController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'nome' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()], 401);
+        }
+        $professor = Professor::create($request->all());
+        return response()->json(['message' => 'Sucesso', 'professor' => $professor], 201);
     }
 
     /**
@@ -58,9 +66,7 @@ class ProfessorController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function edit(Professor $professor)
-    {
-        //
-    }
+    { }
 
     /**
      * Update the specified resource in storage.
@@ -69,9 +75,11 @@ class ProfessorController extends Controller
      * @param  \App\Professor  $professor
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Professor $professor)
+    public function update(Request $request, $id)
     {
-        //
+        $professor = Professor::findOrFail($id);
+        $professor->update($request->all());
+        return response()->json(['message' => 'Sucesso', 'professor' => $professor], 200);
     }
 
     /**
@@ -80,8 +88,17 @@ class ProfessorController extends Controller
      * @param  \App\Professor  $professor
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Professor $professor)
+    public function destroy($id)
     {
-        //
+        $professor = Professor::findOrFail($id);
+        try {
+            if ($professor->delete()) {
+                return response()->json(['message' => 'Sucesso', 'professor' => $professor], 200);
+            } else {
+                return response()->json(['message' => 'Erro'], 404);
+            }
+        } catch (\Illuminate\Database\QueryException $e) {
+            return response()->json(['message' => 'Não é possível deletar um professor que possui provas registradas', 'success' => 'false'], 405);
+        }
     }
 }

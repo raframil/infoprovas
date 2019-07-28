@@ -43,6 +43,10 @@ Route::group(['middleware' => 'auth.role:admin'], function () {
     Route::put('disciplinas/{id}', 'DisciplinaController@update');
     // Deletar disciplina
     Route::delete('disciplinas/{id}', 'DisciplinaController@destroy');
+    // Atualizar Professor
+    Route::put('professores/{id}', 'ProfessorController@update');
+    // Deletar Professor
+    Route::delete('professores/{id}', 'ProfessorController@destroy');
 });
 
 // Listar provas de uma disciplina
@@ -62,6 +66,8 @@ Route::group(['middleware' => 'jwt.auth'], function () {
     Route::post('provas/upload', ['uses' => 'ProvaController@store']);
     Route::post('auth/logout', 'APILoginController@logout');
     Route::get('auth/user', 'APILoginController@user');
+    // Criar um professor
+    Route::post('professores', 'ProfessorController@store');
 });
 
 Route::group(['middleware' => 'jwt.refresh'], function () {

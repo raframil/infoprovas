@@ -50,6 +50,7 @@
                 label="Professor"
                 prepend-icon="person"
                 :items="professores"
+                :loading="isLoadingProfessores"
                 item-text="nome"
                 return-object
                 v-model="createProva.professor"
@@ -58,9 +59,9 @@
               ></v-autocomplete>
             </v-flex>
 
-            <v-flex lg12 xs12 class="pb-5">
+            <v-flex lg12 xs12 class="mb-4 mt-3">
               <p>Não encontrou? Você pode adicionar um novo professor no botão abaixo</p>
-              <v-btn small color="green" class="white--text">
+              <v-btn small color="green" class="white--text" @click="create_dialog=true">
                 <v-icon>add</v-icon>Adicionar Professor
               </v-btn>
             </v-flex>
@@ -127,6 +128,41 @@
       </v-card>
     </v-form>
 
+    <!-- create dialog -->
+    <v-dialog v-model="create_dialog" max-width="500px">
+      <v-form ref="create_professor_form">
+        <v-card>
+          <v-card-title>
+            <span class="headline">Adicionar Professor</span>
+            <p>Preencha com os dados corretos. E-mail é opcional.</p>
+          </v-card-title>
+
+          <v-card-text>
+            <v-container grid-list-md>
+              <v-layout wrap>
+                <v-flex xs12 lg12>
+                  <v-text-field
+                    label="Nome do Professor"
+                    v-model="createProfessor.nome"
+                    :rules="nomeProfessorRules"
+                  ></v-text-field>
+                </v-flex>
+                <v-flex xs12 lg12>
+                  <v-text-field label="E-mail do Professor" v-model="createProfessor.email"></v-text-field>
+                </v-flex>
+              </v-layout>
+            </v-container>
+          </v-card-text>
+
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="grey" flat @click="cancel_create_professor()">Cancelar</v-btn>
+            <v-btn color="teal" flat @click="submit_create_professor()">Salvar</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-form>
+    </v-dialog>
+
     <!-- snackbar -->
     <v-snackbar v-model="snackbar" :timeout="4000" top :color="snackbar_color">
       <span>{{snackbar_message}}</span>
@@ -143,6 +179,12 @@
 <script>
 export default {
   data: () => ({
+    create_dialog: false,
+    createProfessor: {
+      nome: "",
+      email: ""
+    },
+    isLoadingProfessores: false,
     alertaSessaoInvalida: false,
     errorMessage: null,
     loadingBotaoEnviar: false,
@@ -196,6 +238,12 @@ export default {
     },
     // Validações de formulário
     valid: true,
+    emailRules: [
+      v =>
+        /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(v) ||
+        "O email digitado não é válido"
+    ],
+    nomeProfessorRules: [v => !!v || "Nome do professor deve ser preenchido"],
     cursoRules: [v => !!v || "Curso deve ser preenchido"],
     discRules: [v => !!v || "Disciplina deve ser preenchida"],
     professorRules: [v => !!v || "Professor deve ser preenchido"],
@@ -234,6 +282,46 @@ export default {
     }
   },
   methods: {
+    submit_create_professor() {
+      if (this.$refs.create_professor_form.validate()) {
+        fetch("api/professores", {
+          method: "POST",
+          body: JSON.stringify(this.createProfessor),
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("access_token"),
+            "Content-Type": "application/json"
+          }
+        })
+          .then(res => res.json())
+          .then(res => {
+            if (res.error) {
+              this.snackbar_color = "error";
+              this.snackbar_message =
+                "Um erro ocorreu ao adicionar o professor " + res.error;
+              this.snackbar = true;
+              this.create_dialog = false;
+            }
+            this.$refs.create_professor_form.reset();
+            this.getProfessores();
+            this.snackbar_color = "success";
+            this.snackbar_message = "Professor adicionado com sucesso!";
+            this.snackbar = true;
+            this.create_dialog = false;
+          })
+          .catch(err => {
+            this.snackbar_color = "error";
+            this.snackbar_message =
+              "Um erro ocorreu ao adicionar o professor " + err;
+            this.snackbar = true;
+            this.create_dialog = false;
+            console.log(err);
+          });
+      }
+    },
+    cancel_create_professor() {
+      this.create_dialog = false;
+      this.$refs.create_professor_form.reset();
+    },
     fetchCursos() {
       fetch("api/cursos")
         .then(res => res.json())
@@ -249,9 +337,11 @@ export default {
         });
     },
     getProfessores() {
+      this.isLoadingProfessores = true;
       fetch("api/professores")
         .then(res => res.json())
         .then(res => {
+          this.isLoadingProfessores = false;
           this.professores = res.data;
         });
     },

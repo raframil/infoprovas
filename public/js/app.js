@@ -3561,9 +3561,141 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
+      // Criar Professor
+      create_dialog: false,
+      createProfessor: {
+        nome: "",
+        email: ""
+      },
+      nomeProfessorRules: [function (v) {
+        return !!v || "Nome do professor deve ser preenchido";
+      }],
+      // Fim Criar Professor
+      //Deletar Professor
+      delete_dialog: false,
+      deletedProfessor: {
+        nome: "",
+        id: 0
+      },
+      // Fim Deletar Professor
+      // Editar Professor
+      edit_dialog: false,
+      editedProfessor: {
+        nome: "",
+        email: "",
+        id: 0
+      },
+      // Snackbar
+      snackbar: false,
+      snackbar_message: "",
+      snackbar_color: "",
       loadingDataTable: false,
       search: "",
       headers: [{
@@ -3588,19 +3720,129 @@ __webpack_require__.r(__webpack_exports__);
     this.getProfessores();
   },
   methods: {
+    editProfessor: function editProfessor(professor) {
+      this.edit_dialog = true;
+      this.editedProfessor = Object.assign({}, professor);
+    },
+    updateProf: function updateProf(id) {
+      var _this = this;
+
+      fetch("api/professores/" + id, {
+        method: "PUT",
+        body: JSON.stringify(this.editedProfessor),
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + localStorage.getItem("access_token")
+        }
+      }).then(function (res) {
+        return res.json();
+      }).then(function (res) {
+        _this.getProfessores();
+
+        _this.snackbar_color = "success";
+        _this.snackbar_message = "Professor editado com sucesso!";
+        _this.snackbar = true;
+        _this.edit_dialog = false;
+      })["catch"](function (err) {
+        _this.getProfessores();
+
+        _this.snackbar_color = "error";
+        _this.snackbar_message = "Um erro ocorreu " + err;
+        _this.snackbar = true;
+        _this.edit_dialog = false;
+      });
+    },
+    confirmarRemocao: function confirmarRemocao() {
+      this.deleteProfessor(this.deletedProfessor.id);
+    },
+    deleteDialog: function deleteDialog(id, nome) {
+      this.delete_dialog = true;
+      this.deletedProfessor.nome = nome;
+      this.deletedProfessor.id = id;
+    },
+    deleteProfessor: function deleteProfessor(id) {
+      var _this2 = this;
+
+      fetch("api/professores/".concat(id), {
+        method: "delete",
+        headers: new Headers({
+          Authorization: "Bearer " + localStorage.getItem("access_token")
+        })
+      }).then(function (res) {
+        return res.json();
+      }).then(function (res) {
+        if (res.success == "false") {
+          _this2.snackbar_color = "error";
+          _this2.snackbar_message = res.message;
+          _this2.snackbar = true;
+          _this2.delete_dialog = false;
+        } else {
+          _this2.getProfessores();
+
+          _this2.snackbar_color = "success";
+          _this2.snackbar_message = "Professor excluído com sucesso!";
+          _this2.snackbar = true;
+          _this2.delete_dialog = false;
+        }
+      })["catch"](function (err) {
+        return console.log(err);
+      });
+    },
+    submit_create_professor: function submit_create_professor() {
+      var _this3 = this;
+
+      if (this.$refs.create_professor_form.validate()) {
+        fetch("api/professores", {
+          method: "POST",
+          body: JSON.stringify(this.createProfessor),
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("access_token"),
+            "Content-Type": "application/json"
+          }
+        }).then(function (res) {
+          return res.json();
+        }).then(function (res) {
+          if (res.error) {
+            _this3.snackbar_color = "error";
+            _this3.snackbar_message = "Um erro ocorreu ao adicionar o professor " + res.error;
+            _this3.snackbar = true;
+            _this3.create_dialog = false;
+          }
+
+          _this3.$refs.create_professor_form.reset();
+
+          _this3.getProfessores();
+
+          _this3.snackbar_color = "success";
+          _this3.snackbar_message = "Professor adicionado com sucesso!";
+          _this3.snackbar = true;
+          _this3.create_dialog = false;
+        })["catch"](function (err) {
+          _this3.snackbar_color = "error";
+          _this3.snackbar_message = "Um erro ocorreu ao adicionar o professor " + err;
+          _this3.snackbar = true;
+          _this3.create_dialog = false;
+          console.log(err);
+        });
+      }
+    },
+    cancel_create_professor: function cancel_create_professor() {
+      this.create_dialog = false;
+      this.$refs.create_professor_form.reset();
+    },
     voltarPagina: function voltarPagina() {
       this.$router.go(-1);
     },
     getProfessores: function getProfessores() {
-      var _this = this;
+      var _this4 = this;
 
       this.loadingDataTable = true;
       var page_url = "api/professores";
       fetch(page_url).then(function (res) {
         return res.json();
       }).then(function (res) {
-        _this.loadingDataTable = false;
-        _this.professores = res.data;
+        _this4.loadingDataTable = false;
+        _this4.professores = res.data;
       });
     }
   }
@@ -4064,9 +4306,51 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
+      create_dialog: false,
+      createProfessor: {
+        nome: "",
+        email: ""
+      },
+      isLoadingProfessores: false,
       alertaSessaoInvalida: false,
       errorMessage: null,
       loadingBotaoEnviar: false,
@@ -4114,6 +4398,12 @@ __webpack_require__.r(__webpack_exports__);
       },
       // Validações de formulário
       valid: true,
+      emailRules: [function (v) {
+        return /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(v) || "O email digitado não é válido";
+      }],
+      nomeProfessorRules: [function (v) {
+        return !!v || "Nome do professor deve ser preenchido";
+      }],
       cursoRules: [function (v) {
         return !!v || "Curso deve ser preenchido";
       }],
@@ -4167,45 +4457,89 @@ __webpack_require__.r(__webpack_exports__);
     }
   },
   methods: {
-    fetchCursos: function fetchCursos() {
+    submit_create_professor: function submit_create_professor() {
       var _this2 = this;
+
+      if (this.$refs.create_professor_form.validate()) {
+        fetch("api/professores", {
+          method: "POST",
+          body: JSON.stringify(this.createProfessor),
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("access_token"),
+            "Content-Type": "application/json"
+          }
+        }).then(function (res) {
+          return res.json();
+        }).then(function (res) {
+          if (res.error) {
+            _this2.snackbar_color = "error";
+            _this2.snackbar_message = "Um erro ocorreu ao adicionar o professor " + res.error;
+            _this2.snackbar = true;
+            _this2.create_dialog = false;
+          }
+
+          _this2.$refs.create_professor_form.reset();
+
+          _this2.getProfessores();
+
+          _this2.snackbar_color = "success";
+          _this2.snackbar_message = "Professor adicionado com sucesso!";
+          _this2.snackbar = true;
+          _this2.create_dialog = false;
+        })["catch"](function (err) {
+          _this2.snackbar_color = "error";
+          _this2.snackbar_message = "Um erro ocorreu ao adicionar o professor " + err;
+          _this2.snackbar = true;
+          _this2.create_dialog = false;
+          console.log(err);
+        });
+      }
+    },
+    cancel_create_professor: function cancel_create_professor() {
+      this.create_dialog = false;
+      this.$refs.create_professor_form.reset();
+    },
+    fetchCursos: function fetchCursos() {
+      var _this3 = this;
 
       fetch("api/cursos").then(function (res) {
         return res.json();
       }).then(function (res) {
-        _this2.cursos = res.data;
+        _this3.cursos = res.data;
       });
     },
     getTipoProvas: function getTipoProvas() {
-      var _this3 = this;
+      var _this4 = this;
 
       fetch("api/prova_tipos").then(function (res) {
         return res.json();
       }).then(function (res) {
-        _this3.prova_tipos = res.data;
+        _this4.prova_tipos = res.data;
       });
     },
     getProfessores: function getProfessores() {
-      var _this4 = this;
+      var _this5 = this;
 
+      this.isLoadingProfessores = true;
       fetch("api/professores").then(function (res) {
         return res.json();
       }).then(function (res) {
-        _this4.professores = res.data;
+        _this5.isLoadingProfessores = false;
+        _this5.professores = res.data;
       });
     },
     getDisciplinasFromCurso: function getDisciplinasFromCurso() {
-      var _this5 = this;
+      var _this6 = this;
 
       this.isLoading = true;
       fetch("api/disciplinas/".concat(this.curso_id, "?page=").concat(this.pagination.current_page)).then(function (res) {
         return res.json();
       }).then(function (res) {
-        _this5.disciplinas = res.data;
+        _this6.disciplinas = res.data;
 
-        _this5.makePagination(res.meta, res.links);
+        _this6.makePagination(res.meta, res.links);
 
-        _this5.isLoading = false;
+        _this6.isLoading = false;
       });
     },
     curso_campus: function curso_campus(cursos) {
@@ -4251,7 +4585,7 @@ __webpack_require__.r(__webpack_exports__);
       }
     },
     uploadFile: function uploadFile() {
-      var _this6 = this;
+      var _this7 = this;
 
       if (this.$refs.form.validate()) {
         this.loadingBotaoEnviar = true;
@@ -4286,53 +4620,53 @@ __webpack_require__.r(__webpack_exports__);
           return res.json();
         }).then(function (res) {
           if (res.error) {
-            _this6.loadingBotaoEnviar = false;
-            _this6.snackbar_color = "error";
-            _this6.snackbar_message = res.error;
-            _this6.snackbar = true;
+            _this7.loadingBotaoEnviar = false;
+            _this7.snackbar_color = "error";
+            _this7.snackbar_message = res.error;
+            _this7.snackbar = true;
           } else {
-            _this6.loadingBotaoEnviar = false;
-            _this6.snackbar_color = "success";
-            _this6.snackbar_message = "Prova enviada com sucesso";
-            _this6.snackbar = true;
+            _this7.loadingBotaoEnviar = false;
+            _this7.snackbar_color = "success";
+            _this7.snackbar_message = "Prova enviada com sucesso";
+            _this7.snackbar = true;
 
-            _this6.reset();
+            _this7.reset();
 
-            _this6.resetValidation();
+            _this7.resetValidation();
           }
         })["catch"](function (error) {
-          _this6.loadingBotaoEnviar = false;
-          _this6.snackbar_color = "error";
-          _this6.snackbar_message = "Um erro ocorreu";
-          _this6.snackbar = true;
+          _this7.loadingBotaoEnviar = false;
+          _this7.snackbar_color = "error";
+          _this7.snackbar_message = "Um erro ocorreu";
+          _this7.snackbar = true;
           console.log(res.error);
         });
       }
     },
     getUser: function getUser() {
-      var _this7 = this;
+      var _this8 = this;
 
       this.$store.dispatch("getUserData").then(function (response) {
         if (response.data.error) {
           if (response.data.error == "TOKEN_INVALID") {
-            _this7.alertaSessaoInvalida = true;
-            _this7.errorMessage = "Token Inválido. Por favor, realize login novamente  ";
+            _this8.alertaSessaoInvalida = true;
+            _this8.errorMessage = "Token Inválido. Por favor, realize login novamente  ";
             setTimeout(function () {
-              return _this7.$router.push({
+              return _this8.$router.push({
                 name: "logout"
               });
             }, 3000);
           } else if (response.data.error == "TOKEN_EXPIRED") {
-            _this7.alertaSessaoInvalida = true;
-            _this7.errorMessage = "Sua sessão expirou. Por favor, realize login novamente  ";
+            _this8.alertaSessaoInvalida = true;
+            _this8.errorMessage = "Sua sessão expirou. Por favor, realize login novamente  ";
             setTimeout(function () {
-              return _this7.$router.push({
+              return _this8.$router.push({
                 name: "logout"
               });
             }, 3000);
           } else {
             setTimeout(function () {
-              return _this7.$router.push({
+              return _this8.$router.push({
                 name: "logout"
               });
             }, 3000);
@@ -4340,7 +4674,7 @@ __webpack_require__.r(__webpack_exports__);
         }
 
         if (response.data.status == "success" && response.data.data) {
-          _this7.user_id = response.data.data.id;
+          _this8.user_id = response.data.data.id;
         }
       });
     }
@@ -7165,6 +7499,11 @@ var render = function() {
                                 fab: "",
                                 small: "",
                                 dark: ""
+                              },
+                              on: {
+                                click: function($event) {
+                                  return _vm.editProfessor(professores.item)
+                                }
                               }
                             },
                             [_c("v-icon", [_vm._v("edit")])],
@@ -7179,6 +7518,14 @@ var render = function() {
                                 fab: "",
                                 small: "",
                                 dark: ""
+                              },
+                              on: {
+                                click: function($event) {
+                                  return _vm.deleteDialog(
+                                    professores.item.id,
+                                    professores.item.nome
+                                  )
+                                }
                               }
                             },
                             [_c("v-icon", [_vm._v("delete")])],
@@ -7193,6 +7540,392 @@ var render = function() {
               }
             ])
           })
+        ],
+        1
+      ),
+      _vm._v(" "),
+      _c(
+        "v-dialog",
+        {
+          attrs: { "max-width": "500px" },
+          model: {
+            value: _vm.create_dialog,
+            callback: function($$v) {
+              _vm.create_dialog = $$v
+            },
+            expression: "create_dialog"
+          }
+        },
+        [
+          _c(
+            "v-form",
+            { ref: "create_professor_form" },
+            [
+              _c(
+                "v-card",
+                [
+                  _c("v-card-title", [
+                    _c("span", { staticClass: "headline" }, [
+                      _vm._v("Adicionar Professor")
+                    ]),
+                    _vm._v(" "),
+                    _c("p", [
+                      _vm._v(
+                        "Preencha com os dados corretos. E-mail é opcional."
+                      )
+                    ])
+                  ]),
+                  _vm._v(" "),
+                  _c(
+                    "v-card-text",
+                    [
+                      _c(
+                        "v-container",
+                        { attrs: { "grid-list-md": "" } },
+                        [
+                          _c(
+                            "v-layout",
+                            { attrs: { wrap: "" } },
+                            [
+                              _c(
+                                "v-flex",
+                                { attrs: { xs12: "", lg12: "" } },
+                                [
+                                  _c("v-text-field", {
+                                    attrs: {
+                                      label: "Nome do Professor",
+                                      rules: _vm.nomeProfessorRules
+                                    },
+                                    model: {
+                                      value: _vm.createProfessor.nome,
+                                      callback: function($$v) {
+                                        _vm.$set(
+                                          _vm.createProfessor,
+                                          "nome",
+                                          $$v
+                                        )
+                                      },
+                                      expression: "createProfessor.nome"
+                                    }
+                                  })
+                                ],
+                                1
+                              ),
+                              _vm._v(" "),
+                              _c(
+                                "v-flex",
+                                { attrs: { xs12: "", lg12: "" } },
+                                [
+                                  _c("v-text-field", {
+                                    attrs: { label: "E-mail do Professor" },
+                                    model: {
+                                      value: _vm.createProfessor.email,
+                                      callback: function($$v) {
+                                        _vm.$set(
+                                          _vm.createProfessor,
+                                          "email",
+                                          $$v
+                                        )
+                                      },
+                                      expression: "createProfessor.email"
+                                    }
+                                  })
+                                ],
+                                1
+                              )
+                            ],
+                            1
+                          )
+                        ],
+                        1
+                      )
+                    ],
+                    1
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "v-card-actions",
+                    [
+                      _c("v-spacer"),
+                      _vm._v(" "),
+                      _c(
+                        "v-btn",
+                        {
+                          attrs: { color: "grey", flat: "" },
+                          on: {
+                            click: function($event) {
+                              return _vm.cancel_create_professor()
+                            }
+                          }
+                        },
+                        [_vm._v("Cancelar")]
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "v-btn",
+                        {
+                          attrs: { color: "teal", flat: "" },
+                          on: {
+                            click: function($event) {
+                              return _vm.submit_create_professor()
+                            }
+                          }
+                        },
+                        [_vm._v("Salvar")]
+                      )
+                    ],
+                    1
+                  )
+                ],
+                1
+              )
+            ],
+            1
+          )
+        ],
+        1
+      ),
+      _vm._v(" "),
+      _c(
+        "v-dialog",
+        {
+          attrs: { "max-width": "350" },
+          model: {
+            value: _vm.delete_dialog,
+            callback: function($$v) {
+              _vm.delete_dialog = $$v
+            },
+            expression: "delete_dialog"
+          }
+        },
+        [
+          _c(
+            "v-card",
+            [
+              _c(
+                "v-card-title",
+                { staticClass: "headline red accent-3 white--text" },
+                [_vm._v("Confirmar Exclusão")]
+              ),
+              _vm._v(" "),
+              _c("v-card-text", [
+                _vm._v("\n        Você tem\n        "),
+                _c("strong", [_vm._v("certeza")]),
+                _vm._v("\n        que deseja excluir o professor\n        "),
+                _c("span", { staticClass: "indigo--text" }, [
+                  _vm._v(_vm._s(_vm.deletedProfessor.nome) + "?")
+                ])
+              ]),
+              _vm._v(" "),
+              _c(
+                "v-card-actions",
+                [
+                  _c("v-spacer"),
+                  _vm._v(" "),
+                  _c(
+                    "v-btn",
+                    {
+                      attrs: { color: "grey", flat: "flat" },
+                      on: {
+                        click: function($event) {
+                          _vm.delete_dialog = false
+                        }
+                      }
+                    },
+                    [_vm._v("Cancelar")]
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "v-btn",
+                    {
+                      attrs: { color: "red accent-3", flat: "flat" },
+                      on: {
+                        click: function($event) {
+                          return _vm.confirmarRemocao()
+                        }
+                      }
+                    },
+                    [_vm._v("Confirmar")]
+                  )
+                ],
+                1
+              )
+            ],
+            1
+          )
+        ],
+        1
+      ),
+      _vm._v(" "),
+      _c(
+        "v-dialog",
+        {
+          attrs: { "max-width": "500px", persistent: "" },
+          model: {
+            value: _vm.edit_dialog,
+            callback: function($$v) {
+              _vm.edit_dialog = $$v
+            },
+            expression: "edit_dialog"
+          }
+        },
+        [
+          _c(
+            "v-card",
+            [
+              _c("v-card-title", [
+                _c("span", { staticClass: "headline" }, [
+                  _vm._v("Editar Professor")
+                ])
+              ]),
+              _vm._v(" "),
+              _c(
+                "v-card-text",
+                [
+                  _c(
+                    "v-container",
+                    { attrs: { "grid-list-md": "" } },
+                    [
+                      _c(
+                        "v-layout",
+                        { attrs: { wrap: "" } },
+                        [
+                          _c(
+                            "v-flex",
+                            { attrs: { xs12: "", lg12: "" } },
+                            [
+                              _c("v-text-field", {
+                                attrs: {
+                                  label: "Nome do Professor",
+                                  rules: _vm.nomeProfessorRules
+                                },
+                                model: {
+                                  value: _vm.editedProfessor.nome,
+                                  callback: function($$v) {
+                                    _vm.$set(_vm.editedProfessor, "nome", $$v)
+                                  },
+                                  expression: "editedProfessor.nome"
+                                }
+                              })
+                            ],
+                            1
+                          ),
+                          _vm._v(" "),
+                          _c(
+                            "v-flex",
+                            { attrs: { xs12: "", lg12: "" } },
+                            [
+                              _c("v-text-field", {
+                                attrs: { label: "E-mail do Professor" },
+                                model: {
+                                  value: _vm.editedProfessor.email,
+                                  callback: function($$v) {
+                                    _vm.$set(_vm.editedProfessor, "email", $$v)
+                                  },
+                                  expression: "editedProfessor.email"
+                                }
+                              })
+                            ],
+                            1
+                          ),
+                          _vm._v(" "),
+                          _c(
+                            "v-flex",
+                            {
+                              staticClass: "d-none",
+                              attrs: { xs12: "", lg12: "" }
+                            },
+                            [
+                              _c("v-text-field", {
+                                attrs: { disabled: "" },
+                                model: {
+                                  value: _vm.editedProfessor.id,
+                                  callback: function($$v) {
+                                    _vm.$set(_vm.editedProfessor, "id", $$v)
+                                  },
+                                  expression: "editedProfessor.id"
+                                }
+                              })
+                            ],
+                            1
+                          )
+                        ],
+                        1
+                      )
+                    ],
+                    1
+                  )
+                ],
+                1
+              ),
+              _vm._v(" "),
+              _c(
+                "v-card-actions",
+                [
+                  _c("v-spacer"),
+                  _vm._v(" "),
+                  _c(
+                    "v-btn",
+                    {
+                      attrs: { color: "grey", flat: "" },
+                      on: {
+                        click: function($event) {
+                          _vm.edit_dialog = false
+                        }
+                      }
+                    },
+                    [_vm._v("Cancelar")]
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "v-btn",
+                    {
+                      attrs: { color: "teal", flat: "" },
+                      on: {
+                        click: function($event) {
+                          return _vm.updateProf(_vm.editedProfessor.id)
+                        }
+                      }
+                    },
+                    [_vm._v("Salvar")]
+                  )
+                ],
+                1
+              )
+            ],
+            1
+          )
+        ],
+        1
+      ),
+      _vm._v(" "),
+      _c(
+        "v-snackbar",
+        {
+          attrs: { timeout: 4000, top: "", color: _vm.snackbar_color },
+          model: {
+            value: _vm.snackbar,
+            callback: function($$v) {
+              _vm.snackbar = $$v
+            },
+            expression: "snackbar"
+          }
+        },
+        [
+          _c("span", [_vm._v(_vm._s(_vm.snackbar_message))]),
+          _vm._v(" "),
+          _c(
+            "v-btn",
+            {
+              attrs: { flat: "", color: "white" },
+              on: {
+                click: function($event) {
+                  _vm.snackbar = false
+                }
+              }
+            },
+            [_vm._v("Fechar")]
+          )
         ],
         1
       )
@@ -7760,6 +8493,7 @@ var render = function() {
                                   label: "Professor",
                                   "prepend-icon": "person",
                                   items: _vm.professores,
+                                  loading: _vm.isLoadingProfessores,
                                   "item-text": "nome",
                                   "return-object": "",
                                   rules: _vm.professorRules,
@@ -7780,7 +8514,7 @@ var render = function() {
                           _c(
                             "v-flex",
                             {
-                              staticClass: "pb-5",
+                              staticClass: "mb-4 mt-3",
                               attrs: { lg12: "", xs12: "" }
                             },
                             [
@@ -7794,7 +8528,12 @@ var render = function() {
                                 "v-btn",
                                 {
                                   staticClass: "white--text",
-                                  attrs: { small: "", color: "green" }
+                                  attrs: { small: "", color: "green" },
+                                  on: {
+                                    click: function($event) {
+                                      _vm.create_dialog = true
+                                    }
+                                  }
                                 },
                                 [
                                   _c("v-icon", [_vm._v("add")]),
@@ -7992,6 +8731,148 @@ var render = function() {
                               )
                             ],
                             1
+                          )
+                        ],
+                        1
+                      )
+                    ],
+                    1
+                  )
+                ],
+                1
+              )
+            ],
+            1
+          ),
+          _vm._v(" "),
+          _c(
+            "v-dialog",
+            {
+              attrs: { "max-width": "500px" },
+              model: {
+                value: _vm.create_dialog,
+                callback: function($$v) {
+                  _vm.create_dialog = $$v
+                },
+                expression: "create_dialog"
+              }
+            },
+            [
+              _c(
+                "v-form",
+                { ref: "create_professor_form" },
+                [
+                  _c(
+                    "v-card",
+                    [
+                      _c("v-card-title", [
+                        _c("span", { staticClass: "headline" }, [
+                          _vm._v("Adicionar Professor")
+                        ]),
+                        _vm._v(" "),
+                        _c("p", [
+                          _vm._v(
+                            "Preencha com os dados corretos. E-mail é opcional."
+                          )
+                        ])
+                      ]),
+                      _vm._v(" "),
+                      _c(
+                        "v-card-text",
+                        [
+                          _c(
+                            "v-container",
+                            { attrs: { "grid-list-md": "" } },
+                            [
+                              _c(
+                                "v-layout",
+                                { attrs: { wrap: "" } },
+                                [
+                                  _c(
+                                    "v-flex",
+                                    { attrs: { xs12: "", lg12: "" } },
+                                    [
+                                      _c("v-text-field", {
+                                        attrs: {
+                                          label: "Nome do Professor",
+                                          rules: _vm.nomeProfessorRules
+                                        },
+                                        model: {
+                                          value: _vm.createProfessor.nome,
+                                          callback: function($$v) {
+                                            _vm.$set(
+                                              _vm.createProfessor,
+                                              "nome",
+                                              $$v
+                                            )
+                                          },
+                                          expression: "createProfessor.nome"
+                                        }
+                                      })
+                                    ],
+                                    1
+                                  ),
+                                  _vm._v(" "),
+                                  _c(
+                                    "v-flex",
+                                    { attrs: { xs12: "", lg12: "" } },
+                                    [
+                                      _c("v-text-field", {
+                                        attrs: { label: "E-mail do Professor" },
+                                        model: {
+                                          value: _vm.createProfessor.email,
+                                          callback: function($$v) {
+                                            _vm.$set(
+                                              _vm.createProfessor,
+                                              "email",
+                                              $$v
+                                            )
+                                          },
+                                          expression: "createProfessor.email"
+                                        }
+                                      })
+                                    ],
+                                    1
+                                  )
+                                ],
+                                1
+                              )
+                            ],
+                            1
+                          )
+                        ],
+                        1
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "v-card-actions",
+                        [
+                          _c("v-spacer"),
+                          _vm._v(" "),
+                          _c(
+                            "v-btn",
+                            {
+                              attrs: { color: "grey", flat: "" },
+                              on: {
+                                click: function($event) {
+                                  return _vm.cancel_create_professor()
+                                }
+                              }
+                            },
+                            [_vm._v("Cancelar")]
+                          ),
+                          _vm._v(" "),
+                          _c(
+                            "v-btn",
+                            {
+                              attrs: { color: "teal", flat: "" },
+                              on: {
+                                click: function($event) {
+                                  return _vm.submit_create_professor()
+                                }
+                              }
+                            },
+                            [_vm._v("Salvar")]
                           )
                         ],
                         1
