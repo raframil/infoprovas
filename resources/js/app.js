@@ -16,7 +16,7 @@ Vue.use(Vuetify, {
     }
 });
 Vue.use(VueAxios, axios);
-axios.defaults.baseURL = "http://127.0.0.1:8000/api";
+axios.defaults.baseURL = env("API_URL");
 
 // Rotas da aplicacao
 const router = new VueRouter({
