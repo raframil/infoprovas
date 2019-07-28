@@ -38,9 +38,7 @@
               <div>Por que preciso fazer login para enviar uma prova?</div>
             </template>
             <v-card>
-              <v-card-text
-                class="grey lighten-3"
-              >Para evitarmos spam e pessoas mal-intencionadas. As provas enviadas deverão ser aprovadas, ou seja, será verificado no sistema os dados enviados e a veracidade da avaliação.</v-card-text>
+              <v-card-text class="grey lighten-3">Para evitarmos spam e pessoas mal-intencionadas.</v-card-text>
             </v-card>
           </v-expansion-panel-content>
           <v-expansion-panel-content>
@@ -51,6 +49,17 @@
               <v-card-text
                 class="grey lighten-3"
               >Nenhum dado será exibido, garantindo anonimato dos contribuintes.</v-card-text>
+            </v-card>
+          </v-expansion-panel-content>
+          <v-expansion-panel-content>
+            <template v-slot:header>
+              <div>Como posso entrar em contato?</div>
+            </template>
+            <v-card>
+              <v-card-text class="grey lighten-3">
+                Você pode enviar e-mail para
+                <a>uaiprova@gmail.com</a>.
+              </v-card-text>
             </v-card>
           </v-expansion-panel-content>
           <v-expansion-panel-content>
