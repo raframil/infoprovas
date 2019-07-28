@@ -41,7 +41,7 @@
         </v-list-tile>
       </v-list>
 
-      <v-list>
+      <v-list v-if="getRole == 'admin'">
         <v-subheader>
           <v-icon class="mr-3">widgets</v-icon>Administrador
         </v-subheader>
