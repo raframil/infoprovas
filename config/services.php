@@ -44,7 +44,7 @@ return [
         ],
     ],
     'recaptcha' => [
-        'enabled' => false,
+        'enabled' => true,
         'key' => '6Ldwq7AUAAAAAK3_fxLEGjEBKoYQ86kWSdAqOmFT',
         'secret' => '6Ldwq7AUAAAAAFStfLUc8HUpuDOMDqfr0NzUf4zu',
     ],
