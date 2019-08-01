@@ -8,14 +8,17 @@
           </v-btn>
         </v-flex>
         <v-flex lg11>
-          <h1
-            class="display-1 grey--text"
-            lg10
-          >Provas de {{ disciplina.nome }} ({{disciplina.codigo}})</h1>
+          <h1 class="display-1 grey--text" lg10>Provas</h1>
         </v-flex>
       </v-layout>
     </v-container>
     <v-container v-if="provas && provas.length" grid-list-md text-xs-center>
+      <v-toolbar flat color="white">
+        <v-toolbar-title>
+          <span class="primary--text">{{ disciplina.nome }} ({{disciplina.codigo}})</span>
+          <v-spacer></v-spacer>
+        </v-toolbar-title>
+      </v-toolbar>
       <v-data-table
         :headers="headers"
         :items="provas"

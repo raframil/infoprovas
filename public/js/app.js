@@ -3231,6 +3231,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   components: {
@@ -3238,6 +3239,7 @@ __webpack_require__.r(__webpack_exports__);
   },
   data: function data() {
     return {
+      searchDataTable: "",
       snackbar: false,
       snackbar_message: "",
       snackbar_color: "",
@@ -3324,9 +3326,7 @@ __webpack_require__.r(__webpack_exports__);
       fetch("api/disciplinas/".concat(this.curso_id)).then(function (res) {
         return res.json();
       }).then(function (res) {
-        _this.disciplinas = res.data;
-
-        _this.makePagination(res.meta, res.links);
+        _this.disciplinas = res.data; //this.makePagination(res.meta, res.links);
       })["catch"](function (err) {
         console.log(err);
       })["finally"](function () {
@@ -3450,12 +3450,10 @@ __webpack_require__.r(__webpack_exports__);
       var _this5 = this;
 
       this.isLoading = true;
-      fetch("api/disciplinas/".concat(this.curso_id, "?page=").concat(this.pagination.current_page)).then(function (res) {
+      fetch("api/disciplinas/".concat(this.curso_id)).then(function (res) {
         return res.json();
       }).then(function (res) {
-        _this5.disciplinas = res.data;
-
-        _this5.makePagination(res.meta, res.links);
+        _this5.disciplinas = res.data; //this.makePagination(res.meta, res.links);
 
         _this5.isLoading = false;
       });
@@ -4036,7 +4034,7 @@ __webpack_require__.r(__webpack_exports__);
         nome: "",
         codigo: "",
         curso_id: "",
-        num_provas: 0
+        num_provas: ""
       },
       //disciplinas: null,
       pagination: {},
@@ -4100,7 +4098,6 @@ __webpack_require__.r(__webpack_exports__);
       fetch("api/disciplinas/".concat(this.curso_id)).then(function (res) {
         return res.json();
       }).then(function (res) {
-        console.log(res);
         _this2.disciplinas = res.data;
         _this2.isLoading = false;
       });
@@ -4970,6 +4967,19 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -5001,6 +5011,15 @@ __webpack_require__.r(__webpack_exports__);
         title: "Administrar Professores",
         icon: "people",
         path: "/admin/professores"
+      }],
+      items_toolbar: [{
+        title: "Login",
+        icon: "near_me",
+        path: "/login"
+      }, {
+        title: "Registrar",
+        icon: "assignment_ind",
+        path: "/registrar"
       }],
       right: null
     };
@@ -5052,6 +5071,9 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+//
+//
+//
 //
 //
 //
@@ -6891,17 +6913,12 @@ var render = function() {
             { attrs: { "grid-list-md": "", "text-xs-center": "" } },
             [
               _c(
-                "v-toolbar",
-                { attrs: { flat: "", color: "white" } },
+                "v-flex",
+                { staticClass: "text-xs-left", attrs: { xs12: "" } },
                 [
-                  _c("v-toolbar-title", [_vm._v("Disciplinas")]),
-                  _vm._v(" "),
-                  _c("v-spacer"),
-                  _vm._v(" "),
                   _c(
                     "v-btn",
                     {
-                      staticClass: "text-xs-right",
                       attrs: { color: "primary", dark: "" },
                       on: {
                         click: function($event) {
@@ -6915,12 +6932,38 @@ var render = function() {
                 1
               ),
               _vm._v(" "),
+              _c(
+                "v-toolbar",
+                { attrs: { flat: "", color: "white" } },
+                [
+                  _c("v-toolbar-title", [_vm._v("Disciplinas")]),
+                  _vm._v(" "),
+                  _c("v-spacer"),
+                  _vm._v(" "),
+                  _c("v-text-field", {
+                    attrs: {
+                      "append-icon": "search",
+                      label: "Buscar",
+                      "single-line": ""
+                    },
+                    model: {
+                      value: _vm.searchDataTable,
+                      callback: function($$v) {
+                        _vm.searchDataTable = $$v
+                      },
+                      expression: "searchDataTable"
+                    }
+                  })
+                ],
+                1
+              ),
+              _vm._v(" "),
               _c("v-data-table", {
                 staticClass: "elevation-1",
                 attrs: {
                   headers: _vm.headers,
                   items: _vm.disciplinas,
-                  "hide-actions": ""
+                  search: _vm.searchDataTable
                 },
                 scopedSlots: _vm._u(
                   [
@@ -6998,26 +7041,7 @@ var render = function() {
                   false,
                   4217356648
                 )
-              }),
-              _vm._v(" "),
-              _c(
-                "div",
-                { staticClass: "text-xs-center pt-2" },
-                [
-                  _c("v-pagination", {
-                    attrs: { length: _vm.pagination.last_page },
-                    on: { input: _vm.onPageChange },
-                    model: {
-                      value: _vm.pagination.current_page,
-                      callback: function($$v) {
-                        _vm.$set(_vm.pagination, "current_page", $$v)
-                      },
-                      expression: "pagination.current_page"
-                    }
-                  })
-                ],
-                1
-              )
+              })
             ],
             1
           )
@@ -9515,31 +9539,33 @@ var render = function() {
           _vm._v(" "),
           !_vm.loggedIn
             ? _c(
-                "v-menu",
-                { attrs: { "offset-y": "" } },
-                [
-                  _c(
+                "v-toolbar-items",
+                {
+                  staticClass: "hidden-sm-and-down",
+                  attrs: { "offset-y": "" }
+                },
+                _vm._l(_vm.items_toolbar, function(item) {
+                  return _c(
                     "v-btn",
                     {
+                      key: item.icon,
                       attrs: {
-                        slot: "activator",
                         small: "",
                         flat: "",
                         color: "white",
-                        to: { name: "login" }
-                      },
-                      slot: "activator"
+                        to: item.path
+                      }
                     },
                     [
                       _c("v-icon", { attrs: { left: "" } }, [
-                        _vm._v("near_me")
+                        _vm._v(_vm._s(item.icon))
                       ]),
                       _vm._v(" "),
-                      _c("span", [_vm._v("Login")])
+                      _c("span", [_vm._v(_vm._s(item.title))])
                     ],
                     1
                   )
-                ],
+                }),
                 1
               )
             : _vm._e(),
@@ -9547,27 +9573,35 @@ var render = function() {
           !_vm.loggedIn
             ? _c(
                 "v-menu",
-                { attrs: { "offset-y": "" } },
+                { staticClass: "hidden-md-and-up" },
                 [
                   _c(
-                    "v-btn",
-                    {
-                      attrs: {
-                        slot: "activator",
-                        small: "",
-                        flat: "",
-                        color: "white",
-                        to: { name: "registrar" }
-                      },
-                      slot: "activator"
-                    },
-                    [
-                      _c("v-icon", { attrs: { left: "" } }, [
-                        _vm._v("assignment_ind")
-                      ]),
-                      _vm._v(" "),
-                      _c("span", [_vm._v("Registrar")])
-                    ],
+                    "v-toolbar-side-icon",
+                    { attrs: { slot: "activator" }, slot: "activator" },
+                    [_c("v-icon", [_vm._v("more_vert")])],
+                    1
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "v-list",
+                    _vm._l(_vm.items_toolbar, function(item) {
+                      return _c(
+                        "v-list-tile",
+                        { key: item.icon, attrs: { to: item.path } },
+                        [
+                          _c(
+                            "v-list-tile-content",
+                            [
+                              _c("v-list-tile-title", [
+                                _vm._v(_vm._s(item.title))
+                              ])
+                            ],
+                            1
+                          )
+                        ],
+                        1
+                      )
+                    }),
                     1
                   )
                 ],
@@ -9577,7 +9611,7 @@ var render = function() {
           _vm._v(" "),
           _vm.loggedIn
             ? _c(
-                "v-menu",
+                "v-toolbar-items",
                 { attrs: { "offset-y": "" } },
                 [
                   _c(
@@ -9593,7 +9627,9 @@ var render = function() {
                       slot: "activator"
                     },
                     [
-                      _c("v-icon", { attrs: { left: "" } }, [_vm._v("input")]),
+                      _c("v-icon", { attrs: { left: "" } }, [
+                        _vm._v("exit_to_app")
+                      ]),
                       _vm._v(" "),
                       _c("span", [_vm._v("Sair")])
                     ],
@@ -9791,15 +9827,7 @@ var render = function() {
                 _c(
                   "h1",
                   { staticClass: "display-1 grey--text", attrs: { lg10: "" } },
-                  [
-                    _vm._v(
-                      "Provas de " +
-                        _vm._s(_vm.disciplina.nome) +
-                        " (" +
-                        _vm._s(_vm.disciplina.codigo) +
-                        ")"
-                    )
-                  ]
+                  [_vm._v("Provas")]
                 )
               ])
             ],
@@ -9814,6 +9842,30 @@ var render = function() {
             "v-container",
             { attrs: { "grid-list-md": "", "text-xs-center": "" } },
             [
+              _c(
+                "v-toolbar",
+                { attrs: { flat: "", color: "white" } },
+                [
+                  _c(
+                    "v-toolbar-title",
+                    [
+                      _c("span", { staticClass: "primary--text" }, [
+                        _vm._v(
+                          _vm._s(_vm.disciplina.nome) +
+                            " (" +
+                            _vm._s(_vm.disciplina.codigo) +
+                            ")"
+                        )
+                      ]),
+                      _vm._v(" "),
+                      _c("v-spacer")
+                    ],
+                    1
+                  )
+                ],
+                1
+              ),
+              _vm._v(" "),
               _c("v-data-table", {
                 staticClass: "elevation-1",
                 attrs: {

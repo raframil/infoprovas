@@ -27,12 +27,20 @@
       </template>
     </v-autocomplete>
     <v-container v-if="disciplinas && disciplinas.length" grid-list-md text-xs-center>
+      <v-flex xs12 class="text-xs-left">
+        <v-btn color="primary" dark @click="create_dialog=true">Novo Registro</v-btn>
+      </v-flex>
       <v-toolbar flat color="white">
         <v-toolbar-title>Disciplinas</v-toolbar-title>
         <v-spacer></v-spacer>
-        <v-btn color="primary" dark class="text-xs-right" @click="create_dialog=true">Novo Registro</v-btn>
+        <v-text-field v-model="searchDataTable" append-icon="search" label="Buscar" single-line></v-text-field>
       </v-toolbar>
-      <v-data-table :headers="headers" :items="disciplinas" hide-actions class="elevation-1">
+      <v-data-table
+        :headers="headers"
+        :items="disciplinas"
+        :search="searchDataTable"
+        class="elevation-1"
+      >
         <template v-slot:items="disciplinas">
           <td class="text-xs-center">{{ disciplinas.item.periodo }}</td>
           <td class="text-xs-left">{{ disciplinas.item.nome }}</td>
@@ -55,13 +63,6 @@
           </td>
         </template>
       </v-data-table>
-      <div class="text-xs-center pt-2">
-        <v-pagination
-          v-model="pagination.current_page"
-          :length="pagination.last_page"
-          @input="onPageChange"
-        ></v-pagination>
-      </div>
     </v-container>
     <v-container text-xs-center v-else-if="disciplinas && disciplinas.length == 0">
       <h2 class="red--text headline">Não há disciplinas registradas para este curso</h2>
@@ -195,6 +196,7 @@ export default {
   components: { EditForm },
   data() {
     return {
+      searchDataTable: "",
       snackbar: false,
       snackbar_message: "",
       snackbar_color: "",
@@ -279,7 +281,7 @@ export default {
         .then(res => res.json())
         .then(res => {
           this.disciplinas = res.data;
-          this.makePagination(res.meta, res.links);
+          //this.makePagination(res.meta, res.links);
         })
         .catch(err => {
           console.log(err);
@@ -389,13 +391,11 @@ export default {
     },
     getDisciplinasFromCurso() {
       this.isLoading = true;
-      fetch(
-        `api/disciplinas/${this.curso_id}?page=${this.pagination.current_page}`
-      )
+      fetch(`api/disciplinas/${this.curso_id}`)
         .then(res => res.json())
         .then(res => {
           this.disciplinas = res.data;
-          this.makePagination(res.meta, res.links);
+          //this.makePagination(res.meta, res.links);
           this.isLoading = false;
         });
     },

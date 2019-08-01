@@ -68,7 +68,7 @@ export default {
         nome: "",
         codigo: "",
         curso_id: "",
-        num_provas: 0
+        num_provas: ""
       },
 
       //disciplinas: null,
@@ -128,7 +128,6 @@ export default {
       fetch(`api/disciplinas/${this.curso_id}`)
         .then(res => res.json())
         .then(res => {
-          console.log(res);
           this.disciplinas = res.data;
           this.isLoading = false;
         });
