@@ -9,6 +9,8 @@ use JWTAuth;
 use Validator;
 use Response;
 
+use GuzzleHttp\Client;
+
 class APIRegisterController extends Controller
 {
     public function register(Request $request)
