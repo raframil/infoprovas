@@ -17,13 +17,13 @@ class CreateProfessoresTable extends Migration
         Schema::create('professores', function (Blueprint $table) {
             $table->increments('id');
             $table->string('nome', 255);
-            $table->integer('departamento_id')->unsigned();
+            //$table->integer('departamento_id')->unsigned();
             $table->string('email')->nullable();
 
-            $table->foreign('departamento_id')
+            /*$table->foreign('departamento_id')
                 ->references('id')->on('departamentos')
                 ->onDelete('no action')
-                ->onUpdate('no action');
+                ->onUpdate('no action');*/
         });
     }
 
