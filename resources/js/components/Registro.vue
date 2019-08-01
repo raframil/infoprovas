@@ -163,7 +163,7 @@ export default {
   methods: {
     // G Recaptcha
     onVerify: function(response) {
-      console.log(response);
+      //console.log(response);
       this.captchaResponse = response;
     },
     onExpired: function() {
