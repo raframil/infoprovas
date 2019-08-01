@@ -64,7 +64,8 @@ export const store = new Vuex.Store({
                     .post("/auth/register", {
                         name: data.name,
                         email: data.email,
-                        password: data.password
+                        password: data.password,
+                        token: data.token
                     })
                     .then(response => {
                         resolve(response);
