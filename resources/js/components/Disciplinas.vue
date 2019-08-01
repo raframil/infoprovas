@@ -8,18 +8,25 @@
           </v-btn>
         </v-flex>
         <v-flex lg11>
-          <h1 class="display-1 grey--text" lg10>Disciplinas de {{ curso.nome }}</h1>
+          <h1 class="display-1 grey--text" lg10>Disciplinas</h1>
         </v-flex>
       </v-layout>
     </v-container>
 
-    <v-container v-if="disciplinas && disciplinas.length" grid-list-md text-xs-center>
+    <v-card v-if="disciplinas && disciplinas.length" grid-list-md text-xs-center>
+      <v-card-title>
+        Lista de Disciplinas
+        <v-divider class="mx-3" inset vertical></v-divider>
+        <span class="primary--text">{{ curso.nome }}</span>
+        <v-spacer></v-spacer>
+        <v-text-field v-model="search" append-icon="search" label="Buscar" single-line></v-text-field>
+      </v-card-title>
       <v-data-table
         :headers="headers"
         :items="disciplinas"
         :loading="isLoading"
+        :search="search"
         class="elevation-1"
-        hide-actions
       >
         <template v-slot:items="disciplinas">
           <td class="text-xs-center">{{ disciplinas.item.periodo }}</td>
@@ -34,14 +41,7 @@
           </td>
         </template>
       </v-data-table>
-      <div class="text-xs-center pt-2">
-        <v-pagination
-          v-model="pagination.current_page"
-          :length="pagination.last_page"
-          @input="onPageChange"
-        ></v-pagination>
-      </div>
-    </v-container>
+    </v-card>
     <v-container text-xs-center v-else-if="disciplinas && disciplinas.length == 0">
       <h2 class="red--text headline">Não há disciplinas registradas para este curso</h2>
       <p>Entre em contato com seu centro/diretório acadêmico para registrar as disciplinas no sistema</p>
@@ -57,6 +57,7 @@ export default {
   props: ["curso_id"],
   data() {
     return {
+      search: "",
       curso: {
         id: "",
         nome: "",
@@ -96,10 +97,11 @@ export default {
   created() {
     this.getCurso();
     this.getDisciplinasFromCurso();
+    //this.Paginate();
   },
   methods: {
     onPageChange() {
-      this.getDisciplinasFromCurso();
+      //this.Paginate();
     },
     makePagination(meta, links) {
       let pagination = {
@@ -123,6 +125,16 @@ export default {
     },
     getDisciplinasFromCurso() {
       this.isLoading = true;
+      fetch(`api/disciplinas/${this.curso_id}`)
+        .then(res => res.json())
+        .then(res => {
+          console.log(res);
+          this.disciplinas = res.data;
+          this.isLoading = false;
+        });
+    },
+    /*getDisciplinasFromCursoPaginate() {
+      this.isLoading = true;
       fetch(
         `api/disciplinas/${this.curso_id}?page=${this.pagination.current_page}`
       )
@@ -132,7 +144,7 @@ export default {
           this.makePagination(res.meta, res.links);
           this.isLoading = false;
         });
-    },
+    },*/
     voltarPagina() {
       this.$router.go(-1);
     }

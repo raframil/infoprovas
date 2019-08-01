@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
@@ -15,9 +16,20 @@ class DisciplinaController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function showByCurso($curso_id)
+    public function showByCursoPaginate($curso_id)
     {
         $disciplinas = Disciplina::where('curso_id', $curso_id)->paginate(15);
+        //seleciona o numero de provas por disciplina
+        foreach ($disciplinas as $key => $disciplina) {
+            $num_provas = Prova::where("disciplina_id", $disciplina->id)->where("ativo", "S")->count();
+            $disciplina->num_provas = $num_provas;
+        }
+        return DisciplinaResource::collection($disciplinas);
+    }
+
+    public function showByCursoNoPaginate($curso_id)
+    {
+        $disciplinas = Disciplina::where('curso_id', $curso_id)->get();
         //seleciona o numero de provas por disciplina
         foreach ($disciplinas as $key => $disciplina) {
             $num_provas = Prova::where("disciplina_id", $disciplina->id)->where("ativo", "S")->count();

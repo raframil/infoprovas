@@ -29,7 +29,7 @@ Route::get('cursos', 'CursoController@index');
 Route::get('curso/{id}', 'CursoController@show');
 
 // Listar disciplinas de um curso
-Route::get('disciplinas/{curso_id}', 'DisciplinaController@showByCurso');
+Route::get('disciplinas/{curso_id}', 'DisciplinaController@showByCursoNoPaginate');
 // Listar TODAS disciplinas de um curso (autocomplete)
 Route::get('disciplinas/all/{curso_id}', 'DisciplinaController@getAll');
 // Listar uma disciplina

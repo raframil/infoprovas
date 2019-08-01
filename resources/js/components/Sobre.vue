@@ -2,7 +2,9 @@
   <div class="sobre">
     <h1 class="display-2 grey--text">Sobre</h1>
     <v-container class="my-5">
-      <p>O UaiProva foi criado com o propósito de democratizar o conhecimento. Uma plataforma de alunos para alunos, dispondo de provas anteriores de diversas disciplinas e cursos para estudo. As provas aqui compartilhadas foram humildemente cedidas por alunos ou professores. Nenhum dado referente aos envios será exibido publicamente.</p>
+      <p
+        style="text-align:justify"
+      >O UaiProva foi criado com o propósito de democratizar o conhecimento. Uma plataforma de alunos para alunos, dispondo de provas anteriores de diversas disciplinas e cursos para estudo. As provas aqui compartilhadas foram humildemente cedidas por alunos ou professores. Nenhum dado referente aos envios será exibido publicamente.</p>
 
       <div>
         <div class="text-xs-center mt-5">FAQ</div>

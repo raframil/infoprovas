@@ -19,6 +19,7 @@ Vue.use(VueAxios, axios);
 
 // Rotas da aplicacao
 const router = new VueRouter({
+    //mode: "history",
     routes: [
         {
             path: "*",
