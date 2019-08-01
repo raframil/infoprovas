@@ -24,6 +24,7 @@
     },
     "dependencies": {
         "@websanova/vue-auth": "^2.21.14-beta",
+        "vue-recaptcha": "^1.2.0",
         "vuetify": "^1.5.14",
         "vuex": "^3.1.1"
     }

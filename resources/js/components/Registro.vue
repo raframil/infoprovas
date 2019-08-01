@@ -76,6 +76,17 @@
                   </v-layout>
                   <v-layout row>
                     <v-flex xs12 text-xs-center>
+                      <vue-recaptcha
+                        ref="recaptcha"
+                        class="g-recaptcha"
+                        @verify="onVerify"
+                        @expired="onExpired"
+                        :sitekey="sitekey"
+                      ></vue-recaptcha>
+                    </v-flex>
+                  </v-layout>
+                  <v-layout row>
+                    <v-flex xs12 text-xs-center>
                       <v-btn
                         color="primary"
                         @click="register()"
@@ -98,10 +109,22 @@
   </div>
 </template>
 
+<style>
+.g-recaptcha {
+  display: inline-block;
+}
+</style>
+
 <script>
+import VueRecaptcha from "vue-recaptcha";
 export default {
+  components: {
+    "vue-recaptcha": VueRecaptcha
+  },
   data() {
     return {
+      captchaResponse: null,
+      sitekey: "6Ldwq7AUAAAAAK3_fxLEGjEBKoYQ86kWSdAqOmFT",
       registerLoading: false,
       statusRegistro: false,
       usuario: {
@@ -138,6 +161,19 @@ export default {
     }
   },
   methods: {
+    // G Recaptcha
+    onVerify: function(response) {
+      this.captchaResponse = response;
+    },
+    onExpired: function() {
+      this.snackbar_message = "Captcha Expirado";
+      this.snackbar_color = "red";
+      this.snackbar = true;
+    },
+    resetRecaptcha() {
+      this.$refs.recaptcha.reset(); // Direct call reset method
+    },
+    // Fim G Recaptcha
     reset() {
       this.$refs.form.reset();
     },
@@ -146,12 +182,19 @@ export default {
     },
     register() {
       if (this.$refs.form.validate()) {
+        if (this.captchaResponse === null) {
+          this.snackbar_message = "Captcha Inválido";
+          this.snackbar_color = "red";
+          this.snackbar = true;
+          return Promise.reject("Captcha inválido");
+        }
         this.registerLoading = true;
         this.$store
           .dispatch("register", {
             name: this.usuario.name,
             email: this.usuario.email,
-            password: this.usuario.password
+            password: this.usuario.password,
+            token: this.captchaResponse
           })
           .then(response => {
             if (response.data.email) {

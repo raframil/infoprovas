@@ -16,10 +16,14 @@ class APIRegisterController extends Controller
         $validator = Validator::make($request->all(), [
             'email' => 'required|string|email|max:255|unique:users',
             'name' => 'required',
-            'password' => 'required|min:6'
+            'password' => 'required|min:6',
+            'token' => 'required'
         ]);
         if ($validator->fails()) {
             return response()->json($validator->errors());
+        }
+        if (config('services.recaptcha.enabled') && !$this->checkRecaptcha($request->get('token'), $request->ip())) {
+            return response()->json('Recaptcha inválido.', 500);
         }
         User::create([
             'name' => $request->get('name'),
@@ -30,5 +34,20 @@ class APIRegisterController extends Controller
         $token = JWTAuth::fromUser($user);
 
         return Response::json(compact('token'));
+    }
+
+    protected function checkRecaptcha($token, $ip)
+    {
+        $response = (new Client)->post('https://www.google.com/recaptcha/api/siteverify', [
+            'form_params' => [
+                'secret' => config('services.recaptcha.secret'),
+                'response' => $token,
+                'remoteip' => $ip,
+            ],
+        ]);
+
+        $response = json_decode((string) $response->getBody(), true);
+
+        return $response['success'];
     }
 }

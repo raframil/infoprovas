@@ -23,6 +23,8 @@
         <main-app></main-app>
     </v-app>
 
+    <script src="https://www.google.com/recaptcha/api.js?onload=vueRecaptchaApiLoaded&render=explicit" async defer>
+    </script>
     <script src="{{ asset('js/app.js') }}"></script>
 </body>
 
