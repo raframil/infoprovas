@@ -201,11 +201,13 @@ export default {
               this.snackbar_message = "O email já está sendo utilizado";
               this.snackbar_color = "red";
               this.snackbar = true;
+              this.registerLoading = false;
             } else if (response.data.password) {
               this.snackbar_message =
                 "A senha deve possuir pelo menos 6 caracteres";
               this.snackbar_color = "red";
               this.snackbar = true;
+              this.registerLoading = false;
             } else if (response.data.token) {
               this.registerLoading = false;
               this.statusRegistro = true;

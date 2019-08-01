@@ -5418,10 +5418,12 @@ __webpack_require__.r(__webpack_exports__);
             _this2.snackbar_message = "O email já está sendo utilizado";
             _this2.snackbar_color = "red";
             _this2.snackbar = true;
+            _this2.registerLoading = false;
           } else if (response.data.password) {
             _this2.snackbar_message = "A senha deve possuir pelo menos 6 caracteres";
             _this2.snackbar_color = "red";
             _this2.snackbar = true;
+            _this2.registerLoading = false;
           } else if (response.data.token) {
             _this2.registerLoading = false;
             _this2.statusRegistro = true;
