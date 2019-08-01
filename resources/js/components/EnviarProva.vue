@@ -94,7 +94,7 @@
                 min="1"
                 value="1"
                 :readonly="false"
-                label="Período"
+                label="Período em que foi aplicada (1 ou 2)"
                 v-model="createProva.periodo"
                 :rules="periodoRules"
                 required

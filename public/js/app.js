@@ -8771,7 +8771,7 @@ var render = function() {
                                   min: "1",
                                   value: "1",
                                   readonly: false,
-                                  label: "Período",
+                                  label: "Período em que foi aplicada (1 ou 2)",
                                   rules: _vm.periodoRules,
                                   required: ""
                                 },
