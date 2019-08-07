@@ -4349,10 +4349,16 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
+      semestre: [{
+        nome: "Primeiro",
+        valor: "1"
+      }, {
+        nome: "Segundo",
+        valor: "2"
+      }],
       create_dialog: false,
       createProfessor: {
         nome: "",
@@ -4432,9 +4438,7 @@ __webpack_require__.r(__webpack_exports__);
         return v && v.length <= 4 || "O ano não deve exceder 4 caracteres";
       }],
       periodoRules: [function (v) {
-        return !!v || "Período deve ser preenchido";
-      }, function (v) {
-        return v && v.length <= 2 || "O período não deve exceder 2 caracteres";
+        return !!v || "O semestre deve ser selecionado";
       }]
     };
   },
@@ -8765,13 +8769,12 @@ var render = function() {
                               attrs: { lg4: "", md4: "", xs12: "" }
                             },
                             [
-                              _c("v-text-field", {
+                              _c("v-select", {
                                 attrs: {
-                                  type: "number",
-                                  min: "1",
-                                  value: "1",
-                                  readonly: false,
-                                  label: "Período em que foi aplicada (1 ou 2)",
+                                  items: _vm.semestre,
+                                  "item-text": "nome",
+                                  "item-value": "valor",
+                                  label: "Semestre em que foi aplicada",
                                   rules: _vm.periodoRules,
                                   required: ""
                                 },

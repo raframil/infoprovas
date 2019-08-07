@@ -89,16 +89,15 @@
               ></v-text-field>
             </v-flex>
             <v-flex lg4 md4 xs12 class="pr-2 pl-2">
-              <v-text-field
-                type="number"
-                min="1"
-                value="1"
-                :readonly="false"
-                label="Período em que foi aplicada (1 ou 2)"
+              <v-select
                 v-model="createProva.periodo"
+                :items="semestre"
+                item-text="nome"
+                item-value="valor"
+                label="Semestre em que foi aplicada"
                 :rules="periodoRules"
                 required
-              ></v-text-field>
+              ></v-select>
             </v-flex>
 
             <v-flex xs12 text-xs-center class="mt-3">
@@ -179,6 +178,10 @@
 <script>
 export default {
   data: () => ({
+    semestre: [
+      { nome: "Primeiro", valor: "1" },
+      { nome: "Segundo", valor: "2" }
+    ],
     create_dialog: false,
     createProfessor: {
       nome: "",
@@ -253,10 +256,7 @@ export default {
       v => (v && v.length > 3) || "O ano deve possuir 4 caracters (AAAA)",
       v => (v && v.length <= 4) || "O ano não deve exceder 4 caracteres"
     ],
-    periodoRules: [
-      v => !!v || "Período deve ser preenchido",
-      v => (v && v.length <= 2) || "O período não deve exceder 2 caracteres"
-    ]
+    periodoRules: [v => !!v || "O semestre deve ser selecionado"]
   }),
   created() {
     this.getTipoProvas();
